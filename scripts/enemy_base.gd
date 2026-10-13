@@ -104,6 +104,10 @@ func die(combo_multiplier: int = 1) -> void:
 	if gm:
 		gm.register_hit(combo_multiplier)
 		gm.add_score(score_value, combo_multiplier)
+		if gm.has_method("award_currency"):
+			gm.award_currency(15, "enemy_%s_%d" % [name, get_instance_id()])
+		if gm.has_method("spawn_pickup") and randf() < 0.35:
+			gm.spawn_pickup(gm.PickupType.NANOCELL, global_position)
 	
 	# Spawn explosion VFX
 	if explosion_scene != null and get_parent() != null and is_inside_tree():

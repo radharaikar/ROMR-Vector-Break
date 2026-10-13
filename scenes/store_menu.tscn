@@ -1,0 +1,160 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/store_menu.gd" id="1_store"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player_ship.png" id="2_ship"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.03, 0.04, 0.09, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.1, 0.85, 1, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_preview"]
+bg_color = Color(0.05, 0.07, 0.14, 0.8)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9, 0.2, 0.8, 0.7)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="StoreMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_store")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.025, 0.05, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 30
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Header" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="Margin/VBox/Header"]
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "<< HANGAR"
+
+[node name="Title" type="Label" parent="Margin/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "AXIOM OUTFITTER // HANGAR BAY 4"
+horizontal_alignment = 1
+
+[node name="CurrencyLabel" type="Label" parent="Margin/VBox/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.95, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "VECTOR FRAGMENTS: 0 ◆"
+
+[node name="Body" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="CatalogScroll" type="ScrollContainer" parent="Margin/VBox/Body"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CatalogVBox" type="VBoxContainer" parent="Margin/VBox/Body/CatalogScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="SkinsHeader" type="Label" parent="Margin/VBox/Body/CatalogScroll/CatalogVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.85, 1)
+theme_override_font_sizes/font_size = 16
+text = "CHASSIS VARIANTS & SKINS"
+
+[node name="SkinsList" type="VBoxContainer" parent="Margin/VBox/Body/CatalogScroll/CatalogVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HSeparator" type="HSeparator" parent="Margin/VBox/Body/CatalogScroll/CatalogVBox"]
+layout_mode = 2
+
+[node name="UpgradesHeader" type="Label" parent="Margin/VBox/Body/CatalogScroll/CatalogVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.25, 0.95, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "VECTOR COMBAT UPGRADES"
+
+[node name="UpgradesList" type="VBoxContainer" parent="Margin/VBox/Body/CatalogScroll/CatalogVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PreviewArea" type="VBoxContainer" parent="Margin/VBox/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="ShipPreviewContainer" type="PanelContainer" parent="Margin/VBox/Body/PreviewArea"]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_preview")
+
+[node name="ShipSprite" type="Sprite2D" parent="Margin/VBox/Body/PreviewArea/ShipPreviewContainer"]
+position = Vector2(270, 110)
+scale = Vector2(4, 4)
+texture = ExtResource("2_ship")
+
+[node name="PreviewName" type="Label" parent="Margin/VBox/Body/PreviewArea"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "AXIOM Interceptor"
+
+[node name="PreviewDesc" type="Label" parent="Margin/VBox/Body/PreviewArea"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+text = "Standard pale titanium hull with cyan conduit trim. Factory spec."
+autowrap_mode = 3
+
+[node name="ActionButton" type="Button" parent="Margin/VBox/Body/PreviewArea"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "EQUIPPED"

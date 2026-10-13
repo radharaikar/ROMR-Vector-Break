@@ -1,0 +1,223 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/hangar_menu.gd" id="1_hangar"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player_ship.png" id="2_ship"]
+[ext_resource type="PackedScene" path="res://scenes/story_dialogue.tscn" id="3_dialogue"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ship_panel"]
+bg_color = Color(0.04, 0.05, 0.12, 0.8)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0.85, 1, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stats"]
+bg_color = Color(0.03, 0.04, 0.08, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.25, 0.8, 0.7)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="HangarMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hangar")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.025, 0.06, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 60
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 60
+theme_override_constants/margin_bottom = 40
+
+[node name="HBox" type="HBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 60
+
+[node name="NavVBox" type="VBoxContainer" parent="Margin/HBox"]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Margin/HBox/NavVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.9, 0.1, 0.7, 0.8)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 28
+text = "VECTOR//BREAK"
+
+[node name="SubTitle" type="Label" parent="Margin/HBox/NavVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.35, 0.85, 1)
+theme_override_font_sizes/font_size = 14
+text = "THE LAST TRAJECTORY"
+
+[node name="HSeparator" type="HSeparator" parent="Margin/HBox/NavVBox"]
+layout_mode = 2
+
+[node name="ContinueBtn" type="Button" parent="Margin/HBox/NavVBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "CONTINUE CAMPAIGN >>"
+
+[node name="NewGameBtn" type="Button" parent="Margin/HBox/NavVBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 15
+text = "NEW GAME [PROLOGUE]"
+
+[node name="StoreBtn" type="Button" parent="Margin/HBox/NavVBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
+theme_override_font_sizes/font_size = 15
+text = "HANGAR STORE & SKINS"
+
+[node name="BriefingBtn" type="Button" parent="Margin/HBox/NavVBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "MISSION BRIEFING"
+
+[node name="CreditsBtn" type="Button" parent="Margin/HBox/NavVBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.75, 0.85, 1)
+theme_override_font_sizes/font_size = 14
+text = "CREDITS // ROMR"
+
+[node name="QuitBtn" type="Button" parent="Margin/HBox/NavVBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "QUIT TO DESKTOP"
+
+[node name="DisplayVBox" type="VBoxContainer" parent="Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="ShipPanel" type="PanelContainer" parent="Margin/HBox/DisplayVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_ship_panel")
+
+[node name="SpriteContainer" type="Control" parent="Margin/HBox/DisplayVBox/ShipPanel"]
+layout_mode = 2
+
+[node name="ShipSprite" type="Sprite2D" parent="Margin/HBox/DisplayVBox/ShipPanel/SpriteContainer"]
+position = Vector2(360, 200)
+scale = Vector2(5.5, 5.5)
+texture = ExtResource("2_ship")
+
+[node name="StatsPanel" type="PanelContainer" parent="Margin/HBox/DisplayVBox"]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_stats")
+
+[node name="VBox" type="VBoxContainer" parent="Margin/HBox/DisplayVBox/StatsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ActLabel" type="Label" parent="Margin/HBox/DisplayVBox/StatsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.35, 0.85, 1)
+theme_override_font_sizes/font_size = 14
+text = "ACTIVE CAMPAIGN: ACT 1 // OUTPOST 44"
+
+[node name="CurrencyLabel" type="Label" parent="Margin/HBox/DisplayVBox/StatsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "VECTOR FRAGMENTS: 0 ◆"
+
+[node name="CoresLabel" type="Label" parent="Margin/HBox/DisplayVBox/StatsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
+theme_override_font_sizes/font_size = 14
+text = "RECONSTRUCTION CORES: 1 ⬡"
+
+[node name="StoryDialogue" parent="." instance=ExtResource("3_dialogue")]
+
+[node name="CreditsModal" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -180.0
+offset_right = 280.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CreditsModal"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="CreditsTitle" type="Label" parent="CreditsModal/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "TEAM ROMR — RESPawn 2.0"
+horizontal_alignment = 1
+
+[node name="CreditsBody" type="Label" parent="CreditsModal/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "DELL DEVELOPER:
+• Combat Mechanics & Projectile Physics
+• Enemy AI & Wave Progression
+• Encounters & Obstacles
+
+ASUS DEVELOPER:
+• Pixel Art, Visual Effects & Enemy Design
+• Player Health, Upgrades & Skins System
+• Economy & Persistent Save/Load Progression
+• Story Presentation, Transmissions & Lore"
+horizontal_alignment = 1
+
+[node name="CloseCreditsBtn" type="Button" parent="CreditsModal/VBox"]
+custom_minimum_size = Vector2(160, 36)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "CLOSE [X]"
