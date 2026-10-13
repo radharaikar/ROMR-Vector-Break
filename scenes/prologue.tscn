@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/prologue.gd" id="1_prologue"]
 [ext_resource type="Script" path="res://scripts/space_environment.gd" id="2_env"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://scenes/custom_cursor.tscn" id="4_cursor"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_top"]
 normal = Vector2(0, 1)
@@ -196,3 +197,5 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.9, 1)
 theme_override_font_sizes/font_size = 14
 text = "[ RETURN TO HANGAR ]"
+
+[node name="CustomCursor" parent="." instance=ExtResource("4_cursor")]

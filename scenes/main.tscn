@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://scenes/reflector_45.tscn" id="9_reflector_45"]
 [ext_resource type="PackedScene" path="res://scenes/story_dialogue.tscn" id="10_dialogue"]
 [ext_resource type="Script" path="res://scripts/mission_manager.gd" id="11_mission"]
+[ext_resource type="PackedScene" path="res://scenes/custom_cursor.tscn" id="12_cursor"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_top"]
 normal = Vector2(0, 1)
@@ -63,3 +64,5 @@ script = ExtResource("6_spawner")
 
 [node name="MissionManager" type="Node" parent="."]
 script = ExtResource("11_mission")
+
+[node name="CustomCursor" parent="." instance=ExtResource("12_cursor")]

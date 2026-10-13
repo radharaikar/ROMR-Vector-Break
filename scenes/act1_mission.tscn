@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://scripts/round_manager.gd" id="8_round_mgr"]
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="9_hud"]
 [ext_resource type="PackedScene" path="res://scenes/story_dialogue.tscn" id="10_dialogue"]
+[ext_resource type="PackedScene" path="res://scenes/custom_cursor.tscn" id="11_cursor"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_top"]
 normal = Vector2(0, 1)
@@ -173,3 +174,5 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
 theme_override_font_sizes/font_size = 14
 text = "[ REPLAY MISSION ]"
+
+[node name="CustomCursor" parent="." instance=ExtResource("11_cursor")]

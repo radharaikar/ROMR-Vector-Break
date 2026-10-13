@@ -1,14 +1,22 @@
 class_name HostileProjectile
 extends CharacterBody2D
 
-@export var speed: float = 480.0
+# ==============================================================================
+# VECTOR//BREAK — HOSTILE ENEMY PROJECTILE
+# High-velocity crimson energy bolt.
+# Targets the player, cannot damage owner, ricochets once off mirrors.
+# ==============================================================================
+
+@export var speed: float = 460.0
 @export var damage: int = 15
 @export var max_bounces: int = 1
 
 var direction: Vector2 = Vector2.LEFT
 var bounces: int = 0
 var lifetime: float = 5.0
+var shooter: Node = null
 var trail_points: Array[Vector2] = []
+var _has_hit: bool = false
 
 func _ready() -> void:
 	velocity = direction.normalized() * speed
@@ -16,6 +24,9 @@ func _ready() -> void:
 	add_to_group("enemy_projectiles")
 
 func _physics_process(delta: float) -> void:
+	if _has_hit:
+		return
+		
 	lifetime -= delta
 	if lifetime <= 0.0:
 		queue_free()
@@ -31,7 +42,12 @@ func _physics_process(delta: float) -> void:
 		var collider = collision.get_collider()
 		var normal = collision.get_normal()
 		
+		# Prevent self-damage on the enemy that discharged this shot
+		if collider == shooter:
+			return
+		
 		if collider and collider.is_in_group("player") and collider.has_method("take_damage"):
+			_has_hit = true
 			collider.take_damage(damage, self)
 			_destroy()
 		elif collider and collider.is_in_group("reflective"):
@@ -44,13 +60,14 @@ func _physics_process(delta: float) -> void:
 			else:
 				_destroy()
 		elif collider and collider.is_in_group("enemies"):
-			# Pass through other enemies
+			# Pass through other enemies without harming them
 			pass
 		else:
+			# Non-reflective wall or boundary
 			_destroy()
 
 func _draw() -> void:
-	# Draw hostile red/orange glow trail
+	# Hostile crimson / amber trail
 	if trail_points.size() < 2:
 		return
 	for i in range(trail_points.size() - 1):
@@ -58,9 +75,7 @@ func _draw() -> void:
 		var p2 = to_local(trail_points[i + 1])
 		var alpha = 1.0 - (float(i) / float(trail_points.size()))
 		var width = lerp(3.5, 1.0, float(i) / float(trail_points.size()))
-		# Red/orange outer glow
 		draw_line(p1, p2, Color(1.0, 0.2, 0.1, alpha * 0.8), width + 2.0)
-		# Yellow hot core
 		draw_line(p1, p2, Color(1.0, 0.9, 0.3, alpha * 0.95), width * 0.6)
 
 func _destroy() -> void:

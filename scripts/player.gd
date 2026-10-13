@@ -1,19 +1,27 @@
 class_name PlayerShip
 extends CharacterBody2D
 
-## Signals for HUD and gameplay synchronization
+# ==============================================================================
+# VECTOR//BREAK — PLAYER SHIP CONTROLLER
+# Physical multi-directional & strafing thruster physics, smooth mouse tracking,
+# synchronized muzzle/collision/sprite rotation, and combat damage interface.
+# ==============================================================================
+
 signal health_changed(current: int, max: int)
 signal player_damaged(amount: int, hit_source: Variant)
 signal player_healed(amount: int)
 signal invulnerability_changed(is_invulnerable: bool)
 signal player_died()
+signal player_fired(projectile: Node)
 
+@export_group("Flight Dynamics")
 @export var max_speed: float = 380.0
 @export var acceleration: float = 1800.0
 @export var friction: float = 1400.0
+@export var rotation_speed: float = 22.0
 @export var fire_cooldown: float = 0.18
 
-# Health and survival parameters
+@export_group("Survival")
 @export var max_health: int = 100
 var current_health: int = 100
 var is_invulnerable: bool = false
@@ -21,7 +29,7 @@ var invulnerability_duration: float = 0.8
 var invulnerability_timer: float = 0.0
 var is_dead: bool = false
 
-# Weapon and progression modifiers
+# Progression Modifiers
 var can_fire: bool = true
 var fire_timer: float = 0.0
 var max_projectile_bounces_bonus: int = 0
@@ -31,9 +39,9 @@ var current_skin_id: String = "skin_default"
 @onready var sprite: Sprite2D = get_node_or_null("Sprite2D")
 @onready var muzzle: Marker2D = get_node_or_null("Muzzle")
 
-# Playable arena movement boundaries
-const MIN_X: float = 60.0
-const MAX_X: float = 1220.0 # Full 1280x720 arena width with boundary margins
+# Playable arena movement boundaries (Full 1280x720 arena)
+const MIN_X: float = 50.0
+const MAX_X: float = 1230.0
 const MIN_Y: float = 60.0
 const MAX_Y: float = 660.0
 
@@ -46,7 +54,7 @@ func _ready() -> void:
 	emit_signal("health_changed", current_health, max_health)
 
 func _process(delta: float) -> void:
-	# Post-damage invulnerability countdown and visual flicker
+	# Invulnerability countdown & visual flicker
 	if is_invulnerable:
 		invulnerability_timer -= delta
 		if sprite:
@@ -58,9 +66,16 @@ func _process(delta: float) -> void:
 			emit_signal("invulnerability_changed", false)
 	
 	if is_dead:
-		queue_redraw()
 		return
 	
+	# Smooth rotation toward mouse cursor
+	var mouse_pos = get_global_mouse_position()
+	var to_mouse = mouse_pos - global_position
+	if to_mouse.length_squared() > 16.0:
+		var target_angle = to_mouse.angle()
+		rotation = lerp_angle(rotation, target_angle, rotation_speed * delta)
+	
+	# Fire rate management
 	if not can_fire:
 		fire_timer -= delta
 		if fire_timer <= 0.0:
@@ -68,8 +83,6 @@ func _process(delta: float) -> void:
 	
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or Input.is_key_pressed(KEY_SPACE):
 		_try_fire()
-	
-	queue_redraw()
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
@@ -77,33 +90,36 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 	
-	# WASD / Arrow Keys movement
-	var input_vector = Vector2.ZERO
+	# Ship-relative directional controls:
+	# W: Forward along ship heading
+	# S: Reverse / brake against heading
+	# A: Strafe left relative to ship
+	# D: Strafe right relative to ship
+	var forward_dir = Vector2.from_angle(rotation)
+	var strafe_right_dir = Vector2(-forward_dir.y, forward_dir.x) # 90 deg clockwise
+	var strafe_left_dir = -strafe_right_dir
+	
+	var move_vector = Vector2.ZERO
 	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP):
-		input_vector.y -= 1.0
+		move_vector += forward_dir
 	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
-		input_vector.y += 1.0
+		move_vector -= forward_dir
 	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
-		input_vector.x -= 1.0
+		move_vector += strafe_left_dir
 	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
-		input_vector.x += 1.0
+		move_vector += strafe_right_dir
 	
-	input_vector = input_vector.normalized()
-	
-	if input_vector != Vector2.ZERO:
-		velocity = velocity.move_toward(input_vector * max_speed, acceleration * delta)
+	if move_vector != Vector2.ZERO:
+		move_vector = move_vector.normalized()
+		velocity = velocity.move_toward(move_vector * max_speed, acceleration * delta)
 	else:
 		velocity = velocity.move_toward(Vector2.ZERO, friction * delta)
 	
 	move_and_slide()
 	
-	# Clamp position to arena boundaries
+	# Boundary clamping to keep ship fully in playable arena
 	global_position.x = clamp(global_position.x, MIN_X, MAX_X)
 	global_position.y = clamp(global_position.y, MIN_Y, MAX_Y)
-	
-	# Subtle ship banking tilt based on vertical velocity
-	if sprite:
-		sprite.rotation = lerp(sprite.rotation, (velocity.y / max_speed) * 0.18, 12.0 * delta)
 
 func _try_fire() -> void:
 	if not can_fire or is_dead:
@@ -112,11 +128,11 @@ func _try_fire() -> void:
 	can_fire = false
 	fire_timer = fire_cooldown
 	
-	var muzzle_pos = muzzle.global_position if muzzle else global_position + Vector2(28, 0)
+	var muzzle_pos = muzzle.global_position if muzzle else global_position + Vector2.from_angle(rotation) * 28.0
 	var mouse_pos = get_global_mouse_position()
 	var shoot_dir = (mouse_pos - muzzle_pos).normalized()
 	if shoot_dir == Vector2.ZERO:
-		shoot_dir = Vector2.RIGHT
+		shoot_dir = Vector2.from_angle(rotation)
 	
 	var proj_scene = load("res://scenes/energy_projectile.tscn")
 	if proj_scene:
@@ -129,26 +145,10 @@ func _try_fire() -> void:
 			proj.max_bounces += max_projectile_bounces_bonus
 		
 		get_parent().add_child(proj)
+		emit_signal("player_fired", proj)
 		
-		# Recoil kick
-		velocity -= shoot_dir * 40.0
-
-func _draw() -> void:
-	if is_dead:
-		return
-	
-	# Draw neon aiming vector line towards mouse cursor
-	var muzzle_pos = muzzle.position if muzzle else Vector2(28, 0)
-	var local_mouse = to_local(get_global_mouse_position())
-	var aim_dir = (local_mouse - muzzle_pos).normalized()
-	if aim_dir == Vector2.ZERO:
-		aim_dir = Vector2.RIGHT
-	var aim_end = muzzle_pos + aim_dir * aim_preview_length
-	
-	# Faint cyan aiming laser
-	draw_line(muzzle_pos, aim_end, Color(0.2, 0.8, 1.0, 0.45), 1.5)
-	# Crosshair dot at aiming distance
-	draw_circle(aim_end, 2.5, Color(0.3, 0.9, 1.0, 0.75))
+		# Kinetic recoil impulse
+		velocity -= shoot_dir * 50.0
 
 # ==============================================================================
 # COMBAT DAMAGE & HEALING INTERFACE
@@ -233,7 +233,7 @@ func revive(health_percentage: float = 0.5) -> void:
 
 func _on_death() -> void:
 	var spark_scene = load("res://scenes/impact_spark.tscn")
-	if spark_scene:
+	if spark_scene and get_parent():
 		for i in range(6):
 			var spark = spark_scene.instantiate()
 			spark.global_position = global_position
@@ -242,7 +242,7 @@ func _on_death() -> void:
 			get_parent().add_child(spark)
 
 	var vfx_scene = load("res://scenes/enemy_explosion.tscn")
-	if vfx_scene:
+	if vfx_scene and get_parent():
 		var vfx = vfx_scene.instantiate()
 		vfx.global_position = global_position
 		vfx.scale = Vector2(1.5, 1.5)
