@@ -47,6 +47,13 @@ extends CanvasLayer
 
 var _warning_pulse_time: float = 0.0
 
+var _current_round_num: int = 1
+var _total_rounds_num: int = 4
+var _current_wave_num: int = 1
+var _total_waves_num: int = 2
+var _current_hostiles: int = 0
+var _current_time_val: float = 60.0
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
@@ -127,17 +134,21 @@ func _connect_player() -> void:
 			_on_health_changed(player.current_health, player.max_health)
 
 func _hook_round_manager(rm: Node) -> void:
-	if rm.has_signal("round_started"):
+	if rm.has_signal("round_started") and not rm.round_started.is_connected(_on_round_started):
 		rm.round_started.connect(_on_round_started)
-	if rm.has_signal("wave_started"):
+	if rm.has_signal("wave_started") and not rm.wave_started.is_connected(_on_wave_started):
 		rm.wave_started.connect(_on_wave_started)
-	if rm.has_signal("round_time_tick"):
+	if rm.has_signal("round_time_tick") and not rm.round_time_tick.is_connected(_on_time_tick):
 		rm.round_time_tick.connect(_on_time_tick)
-	if rm.has_signal("enemy_count_changed"):
+	if rm.has_signal("enemy_count_changed") and not rm.enemy_count_changed.is_connected(_on_enemy_count_changed):
 		rm.enemy_count_changed.connect(_on_enemy_count_changed)
-	if rm.has_signal("round_victory"):
+	if rm.has_signal("round_cleared") and not rm.round_cleared.is_connected(_on_round_cleared):
+		rm.round_cleared.connect(_on_round_cleared)
+	if rm.has_signal("round_transition_started") and not rm.round_transition_started.is_connected(_on_round_transition):
+		rm.round_transition_started.connect(_on_round_transition)
+	if rm.has_signal("round_victory") and not rm.round_victory.is_connected(_on_victory):
 		rm.round_victory.connect(_on_victory)
-	if rm.has_signal("round_defeat"):
+	if rm.has_signal("round_defeat") and not rm.round_defeat.is_connected(_on_defeat):
 		rm.round_defeat.connect(_on_defeat)
 
 func _on_score_updated(new_score: int) -> void:
@@ -197,31 +208,50 @@ func hide_boss_health() -> void:
 	if boss_health_margin:
 		boss_health_margin.visible = false
 
-func _on_round_started(_idx: int, round_name: String, _time: float) -> void:
+func _on_round_started(idx: int, round_name: String, time_limit: float) -> void:
+	_current_round_num = idx + 1
+	var rm = get_tree().get_first_node_in_group("round_manager")
+	if rm and rm.has_method("get_total_rounds"):
+		_total_rounds_num = rm.get_total_rounds()
+	_current_time_val = time_limit
 	show_banner(round_name, Color(0.2, 0.9, 1.0))
 	if title_label:
 		title_label.text = "VECTOR//BREAK — " + round_name
+	_update_status_display()
 
 func _on_wave_started(wave_idx: int, total_waves: int) -> void:
-	if status_label:
-		status_label.text = "WAVE %d / %d" % [wave_idx, total_waves]
+	_current_wave_num = wave_idx
+	_total_waves_num = total_waves
+	_update_status_display()
 
 func _on_time_tick(time_val: float) -> void:
-	var mins = int(time_val) / 60
-	var secs = int(time_val) % 60
-	if status_label:
-		var current_text = status_label.text.split(" | ")[0]
-		status_label.text = "%s | TIME: %02d:%02d" % [current_text, mins, secs]
+	_current_time_val = time_val
+	_update_status_display()
 
 func _on_enemy_count_changed(remaining: int, _total: int) -> void:
-	if status_label:
-		var parts = status_label.text.split(" | ")
-		var wave_part = parts[0]
-		var time_part = parts[1] if parts.size() > 1 else ""
-		status_label.text = "%s | %s | HOSTILES: %d" % [wave_part, time_part, remaining]
+	_current_hostiles = remaining
+	_update_status_display()
+
+func _update_status_display() -> void:
+	if not status_label:
+		return
+	var mins = int(_current_time_val) / 60
+	var secs = int(_current_time_val) % 60
+	status_label.text = "ROUND %d/%d • WAVE %d/%d | TIME: %02d:%02d | HOSTILES: %d" % [
+		_current_round_num, _total_rounds_num,
+		_current_wave_num, _total_waves_num,
+		mins, secs,
+		_current_hostiles
+	]
+
+func _on_round_cleared(_round_idx: int, round_name: String, reward: int) -> void:
+	show_banner("%s CLEARED!  + %d ◆" % [round_name, reward], Color(0.2, 0.95, 0.6))
+
+func _on_round_transition(next_round_idx: int, total_rounds: int) -> void:
+	show_banner("SECTOR ADVANCE // PREPARING ROUND %d OF %d..." % [next_round_idx + 1, total_rounds], Color(1.0, 0.85, 0.3))
 
 func _on_victory(_round_idx: int, _score: int) -> void:
-	show_banner("SECTOR SECURED — VICTORY", Color(0.3, 1.0, 0.5))
+	show_banner("MISSION COMPLETE // ALL SECTORS SECURED", Color(0.3, 1.0, 0.5))
 	hide_boss_health()
 
 func _on_defeat(reason: String) -> void:

@@ -21,6 +21,7 @@ const SettingsManager = preload("res://scripts/settings_manager.gd")
 @onready var cores_display: Label = $TopBar/HBox/CoresLabel
 
 # Modals
+@onready var modal_backdrop: ColorRect = get_node_or_null("ModalBackdrop")
 @onready var biome_modal: PanelContainer = $BiomeModal
 @onready var collections_modal: PanelContainer = $CollectionsModal
 @onready var level_modal: PanelContainer = $LevelModal
@@ -60,8 +61,27 @@ func _ready() -> void:
 	if close_lvl: close_lvl.pressed.connect(_hide_all_modals)
 	if close_set: close_set.pressed.connect(_hide_all_modals)
 	
+	if modal_backdrop:
+		modal_backdrop.gui_input.connect(func(event):
+			if event is InputEventMouseButton and event.pressed:
+				_hide_all_modals()
+		)
+	
 	# Hide all modals by default
 	_hide_all_modals()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_ESCAPE:
+			if _is_any_modal_open():
+				_hide_all_modals()
+				get_viewport().set_input_as_handled()
+
+func _is_any_modal_open() -> bool:
+	return (biome_modal and biome_modal.visible) or \
+	       (collections_modal and collections_modal.visible) or \
+	       (level_modal and level_modal.visible) or \
+	       (settings_modal and settings_modal.visible)
 
 func _process(delta: float) -> void:
 	_time_elapsed += delta
@@ -116,20 +136,24 @@ func _connect_main_buttons() -> void:
 	if quit_btn: quit_btn.pressed.connect(_on_quit_pressed)
 
 func _hide_all_modals() -> void:
+	if modal_backdrop: modal_backdrop.visible = false
 	if biome_modal: biome_modal.visible = false
 	if collections_modal: collections_modal.visible = false
 	if level_modal: level_modal.visible = false
 	if settings_modal: settings_modal.visible = false
+
+func _show_modal(modal: Control) -> void:
+	_hide_all_modals()
+	if modal_backdrop: modal_backdrop.visible = true
+	if modal: modal.visible = true
 
 # ==============================================================================
 # 1. PLAY / BIOME SELECTION FLOW (2 FREE MAPS + 3 UNLOCKABLE)
 # ==============================================================================
 
 func _on_play_pressed() -> void:
-	_hide_all_modals()
 	_populate_biome_list()
-	if biome_modal:
-		biome_modal.visible = true
+	_show_modal(biome_modal)
 
 func _populate_biome_list() -> void:
 	var container = $BiomeModal/Margin/VBox/Scroll/BiomeList
@@ -219,10 +243,8 @@ func _populate_biome_list() -> void:
 # ==============================================================================
 
 func _on_collections_pressed() -> void:
-	_hide_all_modals()
 	_populate_collections_list()
-	if collections_modal:
-		collections_modal.visible = true
+	_show_modal(collections_modal)
 
 func _populate_collections_list() -> void:
 	var list = $CollectionsModal/Margin/VBox/Scroll/CollectionsList
@@ -296,17 +318,16 @@ func _on_store_pressed() -> void:
 # ==============================================================================
 
 func _on_level_pressed() -> void:
-	_hide_all_modals()
 	_update_level_display()
-	if level_modal:
-		level_modal.visible = true
+	_show_modal(level_modal)
 
 func _update_level_display() -> void:
-	var total_score = SaveManager.get_data().get("stats", {}).get("total_score", 0)
+	var raw_score = SaveManager.get_data().get("stats", {}).get("total_score", 0)
+	var total_score: int = maxi(0, int(raw_score))
 	var xp_per_level: int = 1500
-	var player_level: int = 1 + int(total_score / xp_per_level)
-	var current_xp: int = total_score % xp_per_level
-	var progress_pct: float = float(current_xp) / float(xp_per_level)
+	var player_level: int = 1 + (total_score / xp_per_level if xp_per_level > 0 else 0)
+	var current_xp: int = (total_score % xp_per_level) if xp_per_level > 0 else 0
+	var progress_pct: float = float(current_xp) / float(xp_per_level) if xp_per_level > 0 else 0.0
 	
 	var lvl_lbl = $LevelModal/Margin/VBox/LevelHeaderLabel
 	var xp_lbl = $LevelModal/Margin/VBox/XpLabel
@@ -324,9 +345,7 @@ func _update_level_display() -> void:
 # ==============================================================================
 
 func _on_settings_pressed() -> void:
-	_hide_all_modals()
-	if settings_modal:
-		settings_modal.visible = true
+	_show_modal(settings_modal)
 
 func _setup_settings_controls() -> void:
 	var cfg = SettingsManager.get_settings()

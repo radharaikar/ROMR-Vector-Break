@@ -95,16 +95,9 @@ func _on_round_started(round_idx: int, round_name: String, _time_limit: float) -
 func _on_wave_cleared(wave_idx: int) -> void:
 	pass
 
-func _on_round_victory(round_idx: int, total_score: int) -> void:
-	# If this was the final round (Round 4: Serin defeated)
-	if round_idx >= 3:
-		_trigger_act_completion(total_score)
-	else:
-		# Advance to next round after brief interval
-		get_tree().create_timer(2.0).timeout.connect(func():
-			if round_manager:
-				round_manager.start_round(round_idx + 1)
-		)
+func _on_round_victory(_round_idx: int, total_score: int) -> void:
+	# Final mission victory: trigger victory dialogue and completion overlay
+	_trigger_act_completion(total_score)
 
 func _trigger_act_completion(total_score: int) -> void:
 	if dialogue:

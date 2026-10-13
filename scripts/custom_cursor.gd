@@ -53,7 +53,7 @@ func _process(delta: float) -> void:
 	
 	queue_redraw()
 
-func trigger_fire_flash() -> void:
+func trigger_fire_flash(_projectile: Node = null) -> void:
 	_flash_timer = 0.10
 
 func _draw() -> void:
