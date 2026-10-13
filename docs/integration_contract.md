@@ -147,3 +147,110 @@ Copy all subfolders in `romr_prep/scenes/` to `res://scenes/`:
 3. **Destruction Test:** Fire 3 shots at drone. Verify it explodes into shards (`enemy_explosion.tscn`) and emits `destroyed(100, position)`.
 4. **Ricochet Test:** Place `reflector_45.tscn` in projectile path. Shoot horizontally at reflector face. Verify beam ricochets 90° upward and spawns contact flare.
 5. **Ricochet-Kill Test:** Angle reflector so the ricocheting beam hits an enemy drone behind cover. Confirm damage registers on bounced hit.
+
+---
+
+## 7. Player Health, Damage, and Death Interface (Dell & ASUS)
+
+### Player Node Reference
+Player character scene: `res://scenes/player.tscn`  
+Player script: `res://scripts/player.gd`  
+Class: `PlayerShip` (group: `"player"`)
+
+### Health Methods Called by Dell Systems
+When an enemy, projectile, or hazard damages the player:
+```gdscript
+var player = get_tree().get_first_node_in_group("player")
+if player and player.has_method("take_damage"):
+    # Returns true if damage was applied, false if blocked by invulnerability or dead
+    var hit_success: bool = player.take_damage(damage_amount, self)
+```
+
+### Health Signals Emitted by Player
+```gdscript
+signal health_changed(current_hp: int, max_hp: int)
+signal player_damaged(damage: int)
+signal player_healed(amount: int)
+signal player_died()
+signal invulnerability_changed(is_invulnerable: bool)
+```
+
+### Player Healing Method
+```gdscript
+# Returns actual health restored (capped at max_hp):
+var restored: int = player.heal(heal_amount)
+```
+
+---
+
+## 8. Collectible Pickups & Drops Interface
+
+### Spawn API (Callable from Dell Enemy/Combat Code)
+Dell enemies or round managers can spawn pickups on death without scene coupling:
+```gdscript
+# In enemy death logic:
+var gm = get_node_or_null("/root/GameManager")
+if gm and gm.has_method("spawn_pickup"):
+    # Drop nanocell healing capsule (e.g. 25% drop chance):
+    if randf() < 0.25:
+        gm.spawn_pickup(gm.PickupType.NANOCELL, global_position)
+    # Drop vector fragment currency:
+    gm.spawn_pickup(gm.PickupType.FRAGMENT, global_position, 15)
+```
+
+### Pickup Collision Matrix
+* Pickups reside on collision layer 1 or Area2D monitoring layer 2 (Player).
+* Pickups do not collide with reflectors or enemies.
+
+---
+
+## 9. Currency, Economy, and Reward Protocol
+
+### Centralized Reward Award Call
+```gdscript
+var gm = get_node_or_null("/root/GameManager")
+if gm and gm.has_method("award_currency"):
+    # transaction_id ensures duplicate signals never award multiple times
+    gm.award_currency(amount: int, transaction_id: String)
+```
+
+### Signals
+```gdscript
+signal currency_updated(new_balance: int)
+```
+
+---
+
+## 10. Combat Wave & Boss Synchronization Events
+
+Dell's upcoming wave controller and boss encounters should emit the following signals to synchronize with ASUS HUD and Story systems:
+
+```gdscript
+# Emitted when a round/wave starts:
+signal wave_started(wave_number: int, wave_name: String)
+
+# Emitted when a round/wave is completed:
+signal wave_completed(wave_number: int, reward_fragments: int)
+
+# Emitted when a boss appears (pauses background music, triggers holo-transmission):
+signal boss_spawned(boss_name: String, boss_max_hp: int)
+
+# Emitted when a boss is defeated:
+signal boss_defeated(boss_name: String, reward_fragments: int)
+```
+
+---
+
+## 11. Story & Mission Progression Hooks
+
+```gdscript
+# Request a mission briefing dialog overlay:
+GameManager.request_briefing(mission_id: String)
+
+# Request story transmission dialogue:
+GameManager.trigger_transmission(transmission_id: String)
+
+# Request campaign ending / victory debrief:
+GameManager.trigger_victory(mission_id: String)
+```
+
