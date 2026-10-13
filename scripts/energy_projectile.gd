@@ -56,8 +56,11 @@ func _physics_process(delta: float) -> void:
 			
 			if bounces >= max_bounces:
 				_destroy()
+		elif collider and collider.is_in_group("player"):
+			# Ignore player to prevent firing self-hits in tight maneuvers
+			pass
 		elif collider and collider.has_method("take_damage"):
-			collider.take_damage(damage, ricochet_combo)
+			collider.take_damage(damage, ricochet_combo, collision.get_position())
 			_spawn_sparks(collision.get_position(), -direction, Color(1.0, 0.3, 0.8))
 			_destroy()
 		else:
