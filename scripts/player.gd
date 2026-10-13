@@ -15,7 +15,7 @@ signal player_died()
 signal player_fired(projectile: Node)
 
 @export_group("Flight Dynamics")
-@export var max_speed: float = 380.0
+@export var max_speed: float = 342.0
 @export var acceleration: float = 1800.0
 @export var friction: float = 1400.0
 @export var rotation_speed: float = 22.0
@@ -128,7 +128,7 @@ func _try_fire() -> void:
 	can_fire = false
 	fire_timer = fire_cooldown
 	
-	var muzzle_pos = muzzle.global_position if muzzle else global_position + Vector2.from_angle(rotation) * 28.0
+	var muzzle_pos = muzzle.global_position if muzzle else global_position + Vector2.from_angle(rotation) * 32.0
 	var mouse_pos = get_global_mouse_position()
 	var shoot_dir = (mouse_pos - muzzle_pos).normalized()
 	if shoot_dir == Vector2.ZERO:

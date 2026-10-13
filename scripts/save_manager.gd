@@ -32,6 +32,8 @@ static func get_default_data() -> Dictionary:
 			"oracle_warned": false,
 			"mira_contacted": false
 		},
+		"unlocked_biomes": ["neon_graveyard", "vesper_desert"],
+		"selected_biome": "neon_graveyard",
 		"stats": {
 			"total_kills": 0,
 			"total_ricochets": 0,
@@ -191,6 +193,38 @@ static func set_story_flag(flag_name: String, value: bool = true) -> void:
 static func get_story_flag(flag_name: String) -> bool:
 	var flags: Dictionary = get_data().get("story_flags", {})
 	return flags.get(flag_name, false)
+
+# --- Biome & Map Helpers ---
+
+static func is_biome_unlocked(biome_id: String) -> bool:
+	var list: Array = get_data().get("unlocked_biomes", ["neon_graveyard", "vesper_desert"])
+	return biome_id in list
+
+static func unlock_biome(biome_id: String, cost: int = 0) -> bool:
+	if is_biome_unlocked(biome_id):
+		return true
+	if cost > 0 and get_currency() < cost:
+		return false
+	if cost > 0:
+		spend_currency(cost)
+	var data = get_data()
+	var list: Array = data.get("unlocked_biomes", ["neon_graveyard", "vesper_desert"])
+	if biome_id not in list:
+		list.append(biome_id)
+		data["unlocked_biomes"] = list
+		save_data()
+	return true
+
+static func select_biome(biome_id: String) -> bool:
+	if not is_biome_unlocked(biome_id):
+		return false
+	var data = get_data()
+	data["selected_biome"] = biome_id
+	save_data()
+	return true
+
+static func get_selected_biome() -> String:
+	return get_data().get("selected_biome", "neon_graveyard")
 
 # --- Safe Migration Helper ---
 

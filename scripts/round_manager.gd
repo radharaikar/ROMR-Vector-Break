@@ -33,6 +33,7 @@ var enemy_scenes: Dictionary = {
 	"striker": preload("res://scenes/enemy_striker.tscn"),
 	"dasher": preload("res://scenes/enemy_dasher.tscn"),
 	"heavy": preload("res://scenes/enemy_heavy.tscn"),
+	"elite": preload("res://scenes/enemy_elite.tscn"),
 	"boss_serin": preload("res://scenes/boss_serin.tscn")
 }
 

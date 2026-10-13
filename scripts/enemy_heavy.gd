@@ -65,12 +65,17 @@ func _physics_process(delta: float) -> void:
 func _fire_heavy_cannon(target_dir: Vector2) -> void:
 	_fire_timer = fire_interval
 	if projectile_scene and get_parent():
-		var proj = projectile_scene.instantiate()
-		proj.global_position = global_position + target_dir * 32.0
-		proj.direction = target_dir
-		proj.damage = cannon_damage
-		proj.shooter = self # Prevent self-damage
-		get_parent().add_child(proj)
+		var angles = [0.0, 0.16, -0.16]
+		for ang in angles:
+			var spread_dir = target_dir.rotated(ang)
+			var proj = projectile_scene.instantiate()
+			proj.global_position = global_position + spread_dir * 32.0
+			proj.direction = spread_dir
+			proj.damage = cannon_damage
+			proj.speed = 380.0
+			proj.shooter = self # Prevent self-damage
+			proj.add_collision_exception_with(self)
+			get_parent().add_child(proj)
 
 func take_damage(amount: int, combo_multiplier: Variant = 1, hit_point: Vector2 = Vector2.ZERO) -> void:
 	if is_dead or amount <= 0:

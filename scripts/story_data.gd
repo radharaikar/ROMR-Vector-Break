@@ -85,6 +85,29 @@ static func get_dialogue(dialogue_id: String) -> Array:
 				}
 			]
 		
+		"elite_encounter":
+			return [
+				{
+					"speaker": "LUCIEN VALE [AXIOM HIGH COMMAND]",
+					"color": Color(1.0, 0.25, 0.25),
+					"text": "Subject Kael Veyr. You cannot outrun the calculations. Elite Arbiter unit deployed to terminate trajectory."
+				},
+				{
+					"speaker": "KAEL VEYR",
+					"color": Color(0.3, 0.8, 1.0),
+					"text": "Save your calculations, Vale. I'm breaking the circuit."
+				}
+			]
+		
+		"wave_escalation":
+			return [
+				{
+					"speaker": "ORACLE TACTICAL AI",
+					"color": Color(0.2, 0.9, 1.0),
+					"text": "Trajectory deviation detected. Hostile reinforcements arriving from multiple breaches."
+				}
+			]
+		
 		"act1_victory":
 			return [
 				{

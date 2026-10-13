@@ -134,7 +134,10 @@ func _show_victory_screen(total_score: int) -> void:
 		victory_panel.visible = true
 
 func _on_hub_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/hangar_menu.tscn")
+	if ResourceLoader.exists("res://scenes/main_menu.tscn"):
+		get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+	else:
+		get_tree().change_scene_to_file("res://scenes/hangar_menu.tscn")
 
 func _on_replay_pressed() -> void:
 	get_tree().reload_current_scene()

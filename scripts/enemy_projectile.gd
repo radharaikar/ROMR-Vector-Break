@@ -59,8 +59,8 @@ func _physics_process(delta: float) -> void:
 				global_position += normal * 3.0
 			else:
 				_destroy()
-		elif collider and collider.is_in_group("enemies"):
-			# Pass through other enemies without harming them
+		elif collider and (collider.is_in_group("enemies") or collider.is_in_group("enemy_projectiles")):
+			# Pass through other hostiles and projectile volleys without collision
 			pass
 		else:
 			# Non-reflective wall or boundary
