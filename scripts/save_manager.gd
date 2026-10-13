@@ -18,6 +18,8 @@ static func get_default_data() -> Dictionary:
 		"reconstruction_cores": 1,
 		"campaign_act": 1,
 		"campaign_mission": 1,
+		"unlocked_acts": [1],
+		"completed_acts": [],
 		"completed_missions": [],
 		"unlocked_skins": ["skin_default"],
 		"equipped_skin": "skin_default",
@@ -93,6 +95,27 @@ static func save_data(custom_path: String = SAVE_PATH) -> bool:
 
 static func reset_data(custom_path: String = SAVE_PATH) -> void:
 	current_data = get_default_data()
+	save_data(custom_path)
+
+static func has_active_save() -> bool:
+	if not FileAccess.file_exists(SAVE_PATH):
+		return false
+	var data = get_data()
+	var missions: Array = data.get("completed_missions", [])
+	return missions.size() > 0 or get_story_flag("saw_prologue") or data.get("campaign_act", 1) > 1
+
+static func reset_campaign_only(custom_path: String = SAVE_PATH) -> void:
+	var data = get_data()
+	data["campaign_act"] = 1
+	data["campaign_mission"] = 1
+	data["unlocked_acts"] = [1]
+	data["completed_acts"] = []
+	data["completed_missions"] = []
+	data["story_flags"] = {
+		"saw_prologue": false,
+		"oracle_warned": false,
+		"mira_contacted": false
+	}
 	save_data(custom_path)
 
 # --- Currency Helpers ---
@@ -178,6 +201,41 @@ static func use_reconstruction_core() -> bool:
 	data["reconstruction_cores"] = count - 1
 	save_data()
 	return true
+
+# --- Campaign & Act Unlocks ---
+
+static func is_act_unlocked(act_number: int) -> bool:
+	var acts: Array = get_data().get("unlocked_acts", [1])
+	for a in acts:
+		if int(a) == act_number:
+			return true
+	return false
+
+static func unlock_act(act_number: int) -> void:
+	var data = get_data()
+	var acts: Array = data.get("unlocked_acts", [1])
+	if not is_act_unlocked(act_number):
+		acts.append(act_number)
+		data["unlocked_acts"] = acts
+		save_data()
+
+static func complete_act(act_number: int) -> void:
+	var data = get_data()
+	var completed: Array = data.get("completed_acts", [])
+	if not is_act_completed(act_number):
+		completed.append(act_number)
+		data["completed_acts"] = completed
+	unlock_act(act_number + 1)
+	if act_number + 1 <= 5:
+		data["campaign_act"] = act_number + 1
+	save_data()
+
+static func is_act_completed(act_number: int) -> bool:
+	var completed: Array = get_data().get("completed_acts", [])
+	for a in completed:
+		if int(a) == act_number:
+			return true
+	return false
 
 # --- Story & Campaign Flags ---
 

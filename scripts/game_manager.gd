@@ -147,6 +147,12 @@ func execute_revive() -> bool:
 	
 	has_used_revive_this_run = true
 	
+	# Clear active enemy projectiles to ensure safe player recovery
+	var enemy_bullets = get_tree().get_nodes_in_group("enemy_projectiles")
+	for b in enemy_bullets:
+		if is_instance_valid(b):
+			b.queue_free()
+	
 	# Find player and execute revive
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("revive"):

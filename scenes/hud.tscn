@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/hud.gd" id="1_hud"]
 
@@ -59,13 +59,38 @@ border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(1, 0.2, 0.35, 1)
+border_color = Color(1, 0.25, 0.35, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause"]
+bg_color = Color(0.025, 0.035, 0.08, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.85, 1, 0.95)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_victory"]
+bg_color = Color(0.02, 0.04, 0.08, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.95, 0.6, 0.95)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [node name="HUD" type="CanvasLayer"]
+process_mode = 3
 script = ExtResource("1_hud")
 
 [node name="Control" type="Control" parent="."]
@@ -207,7 +232,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.02, 0.02, 0.06, 0.85)
+color = Color(0.02, 0.02, 0.06, 0.88)
 
 [node name="CenterContainer" type="CenterContainer" parent="Control/DefeatOverlay"]
 layout_mode = 1
@@ -268,4 +293,149 @@ text = "[ RETRY SECTOR ]"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.8, 1)
 theme_override_font_sizes/font_size = 14
+text = "[ RETURN TO HANGAR ]"
+
+[node name="PauseOverlay" type="Control" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="Control/PauseOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.015, 0.02, 0.05, 0.85)
+
+[node name="CenterContainer" type="CenterContainer" parent="Control/PauseOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PausePanel" type="PanelContainer" parent="Control/PauseOverlay/CenterContainer"]
+custom_minimum_size = Vector2(400, 240)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pause")
+
+[node name="VBox" type="VBoxContainer" parent="Control/PauseOverlay/CenterContainer/PausePanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="PauseTitle" type="Label" parent="Control/PauseOverlay/CenterContainer/PausePanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "TACTICAL PAUSE // SYSTEMS STANDBY"
+horizontal_alignment = 1
+
+[node name="PauseSub" type="Label" parent="Control/PauseOverlay/CenterContainer/PausePanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.75, 0.85, 1)
+theme_override_font_sizes/font_size = 13
+text = "Vector momentum suspended."
+horizontal_alignment = 1
+
+[node name="ButtonContainer" type="VBoxContainer" parent="Control/PauseOverlay/CenterContainer/PausePanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ResumeButton" type="Button" parent="Control/PauseOverlay/CenterContainer/PausePanel/VBox/ButtonContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+text = "[ RESUME FLIGHT ]"
+
+[node name="RestartButton" type="Button" parent="Control/PauseOverlay/CenterContainer/PausePanel/VBox/ButtonContainer"]
+layout_mode = 2
+text = "[ RESTART MISSION ]"
+
+[node name="HangarButton" type="Button" parent="Control/PauseOverlay/CenterContainer/PausePanel/VBox/ButtonContainer"]
+layout_mode = 2
+text = "[ ABORT TO HANGAR ]"
+
+[node name="VictoryOverlay" type="Control" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="Control/VictoryOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.015, 0.03, 0.05, 0.9)
+
+[node name="CenterContainer" type="CenterContainer" parent="Control/VictoryOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VictoryPanel" type="PanelContainer" parent="Control/VictoryOverlay/CenterContainer"]
+custom_minimum_size = Vector2(460, 260)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_victory")
+
+[node name="VBox" type="VBoxContainer" parent="Control/VictoryOverlay/CenterContainer/VictoryPanel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="VictoryTitle" type="Label" parent="Control/VictoryOverlay/CenterContainer/VictoryPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 0.6, 1)
+theme_override_font_sizes/font_size = 22
+text = "SECTOR SECURED // MISSION COMPLETE"
+horizontal_alignment = 1
+
+[node name="VictorySub" type="Label" parent="Control/VictoryOverlay/CenterContainer/VictoryPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.95, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "Tactical data relay extracted. AXIOM perimeter fractured."
+horizontal_alignment = 1
+
+[node name="StatsRow" type="HBoxContainer" parent="Control/VictoryOverlay/CenterContainer/VictoryPanel/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 30
+
+[node name="ScoreVal" type="Label" parent="Control/VictoryOverlay/CenterContainer/VictoryPanel/VBox/StatsRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "SCORE: 0"
+
+[node name="RewardVal" type="Label" parent="Control/VictoryOverlay/CenterContainer/VictoryPanel/VBox/StatsRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 0.6, 1)
+theme_override_font_sizes/font_size = 15
+text = "+200 VECTOR FRAGMENTS ◆"
+
+[node name="ButtonContainer" type="VBoxContainer" parent="Control/VictoryOverlay/CenterContainer/VictoryPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="NextButton" type="Button" parent="Control/VictoryOverlay/CenterContainer/VictoryPanel/VBox/ButtonContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+text = "[ NEXT OPERATION (CAMPAIGN MAP) >> ]"
+
+[node name="HangarButton" type="Button" parent="Control/VictoryOverlay/CenterContainer/VictoryPanel/VBox/ButtonContainer"]
+layout_mode = 2
 text = "[ RETURN TO HANGAR ]"
