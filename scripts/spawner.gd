@@ -1,8 +1,12 @@
 class_name EnemySpawner
 extends Node2D
 
-@export var max_active_enemies: int = 3
+@export var max_active_enemies: int = 4
 @export var spawn_interval: float = 3.0
+@export var drone_scenes: Array[PackedScene] = [
+	preload("res://scenes/geometric_drone.tscn"),
+	preload("res://scenes/enemy_drone.tscn")
+]
 
 var spawn_timer: float = 0.5
 var drone_scene: PackedScene = preload("res://scenes/geometric_drone.tscn")
@@ -16,6 +20,7 @@ func _process(delta: float) -> void:
 func _check_and_spawn() -> void:
 	var current_enemies = get_tree().get_nodes_in_group("enemies")
 	if current_enemies.size() < max_active_enemies:
-		var drone = drone_scene.instantiate()
+		var scene_to_spawn = drone_scenes.pick_random() if drone_scenes.size() > 0 else drone_scene
+		var drone = scene_to_spawn.instantiate()
 		drone.global_position = Vector2(1320.0, randf_range(140.0, 580.0))
 		get_parent().add_child(drone)

@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_drone.gd" id="1_drone"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemy_drone_basic.png" id="2_tex"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_explosion.tscn" id="3_exp"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_drone"]
+radius = 16.0
+
+[node name="EnemyDrone" type="CharacterBody2D" groups=["enemies"]]
+collision_layer = 4
+collision_mask = 2
+motion_mode = 1
+script = ExtResource("1_drone")
+max_health = 50
+score_value = 100
+base_speed = 65.0
+explosion_scene = ExtResource("3_exp")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_tex")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_drone")

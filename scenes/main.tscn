@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/space_environment.gd" id="2_env"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="3_player"]
@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" path="res://scenes/geometric_drone.tscn" id="5_drone"]
 [ext_resource type="Script" path="res://scripts/spawner.gd" id="6_spawner"]
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="7_hud"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_drone.tscn" id="8_enemy_drone"]
+[ext_resource type="PackedScene" path="res://scenes/reflector_45.tscn" id="9_reflector_45"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_top"]
 normal = Vector2(0, 1)
@@ -38,11 +40,17 @@ rotation = -0.785398
 position = Vector2(580, 240)
 rotation = 0.785398
 
+[node name="Reflector45" parent="." instance=ExtResource("9_reflector_45")]
+position = Vector2(750, 480)
+
 [node name="Player" parent="." instance=ExtResource("3_player")]
 position = Vector2(160, 360)
 
 [node name="GeometricDrone" parent="." instance=ExtResource("5_drone")]
 position = Vector2(960, 240)
+
+[node name="EnemyDrone" parent="." instance=ExtResource("8_enemy_drone")]
+position = Vector2(960, 480)
 
 [node name="EnemySpawner" type="Node2D" parent="."]
 script = ExtResource("6_spawner")

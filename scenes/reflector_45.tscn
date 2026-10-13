@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/reflector_surface.gd" id="1_refl"]
+[ext_resource type="Texture2D" path="res://assets/sprites/reflector_angled_45.png" id="2_tex"]
+[ext_resource type="PackedScene" path="res://scenes/ricochet_flash.tscn" id="3_flash"]
+
+[node name="Reflector45" type="StaticBody2D" groups=["reflective", "reflectors"]]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_refl")
+bounce_effect_scene = ExtResource("3_flash")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_tex")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-16, 16, 16, -16, 16, 16)
