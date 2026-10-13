@@ -1,147 +1,256 @@
-# ROMR // VECTOR//BREAK — Integration Interface Contract
-**Document Version:** 1.0.0  
-**Ownership Split:** Dell (Combat & Encounters) / ASUS (Economy, Progression & UI)
+# VECTOR//BREAK — Dell & ASUS Integration Contract & Checklist
+
+**Game:** VECTOR//BREAK  
+**Team:** ROMR (RESPawn 2.0 12-Hour Sci-Fi Game Jam)  
+**Engine:** Godot 4.7.2 Forward+ | GDScript  
+**Document Purpose:** Defines shared technical boundaries, node naming, collision matrix, exact file paths, interface protocols, and verification tests between the Dell developer (Player, Physics, Core Project) and the ASUS developer (Art Assets, Enemies, Visual Effects).
 
 ---
 
-## 1. Ownership & Responsibility Boundaries
+## 1. Ownership Demarcation
 
-| System Domain | Responsible Node / Machine | Scope & Ownership |
-|---|---|---|
-| **Combat Engine & AI** | **Dell** | Enemy AI behavior, projectile collision, combat hit detection, ricochet mechanics, boss phases, difficulty scaling. |
-| **Encounter & Flow** | **Dell** | RoundManager, wave spawning, countdown timers, combat obstacles, combat victory/defeat logic. |
-| **Player Combat Core** | **Dell** | Ship movement physics, mouse aiming, projectile firing, combat damage intake, i-frames. |
-| **Player Presentation & UI** | **ASUS** | Health bar HUD presentation, shield gauges, player death/revive animations, game-over screen. |
-| **Economy & Upgrades** | **ASUS** | Healing pickups, scrap/currency drops, store, hangar menu, skins, ship abilities, save/load. |
-| **Narrative & Meta UI** | **ASUS** | Mission briefing dialogue boxes, cutscene screens, campaign level-select menu, settings. |
+| Area | Dell Ownership | ASUS Ownership |
+| :--- | :--- | :--- |
+| **Engine Core** | `project.godot`, Main scene, Viewport settings | *No modifications* |
+| **Player** | Movement controller, mouse aim, weapon trigger | Visual sprite & thruster sheet provided |
+| **Weapons / Physics** | Projectile node, raycasting, ricochet math | Projectile sprite, impact & bounce VFX provided |
+| **Enemies** | Integration into spawning wave system | Enemy base class, 3 archetypes, scenes, death VFX |
+| **Environment** | Level geometry tilemap/containers | Reflector sprites, angled mirror scenes |
 
 ---
 
-## 2. Shared Signal & Method Contracts
+## 2. Collision Matrix (Godot 2D Physics Layers)
 
-To ensure zero merge conflicts and seamless integration, both sides adhere to decoupled signals and small duck-typed APIs.
+To prevent collision cross-talk between allies, projectiles, and reflectors, the following layer allocation is established:
 
-### 2.1 Player Health & Damage Contract (Target: Node in group `"player"`)
+| Layer Bit | Value | Name | Used By | Collides With (Mask) |
+| :---: | :---: | :--- | :--- | :--- |
+| **1 (Bit 0)** | `1` | `World / Walls` | Static boundaries, station catwalks | Player, Enemies, Projectiles |
+| **2 (Bit 1)** | `2` | `Player` | Player ship hitbox (`CharacterBody2D`) | World, Enemy Projectiles, Enemy Bodies |
+| **3 (Bit 2)** | `4` | `Enemies` | Drone, Fast, Heavy (`CharacterBody2D`) | World (1), Player Projectiles (8) |
+| **4 (Bit 3)** | `8` | `Player Projectiles` | Laser bolts (`Area2D` or `RayCast2D`) | World (1), Enemies (4), Reflectors (16) |
+| **5 (Bit 4)** | `16`| `Reflectors` | Angled mirrors, bounce barriers | Player Projectiles (8) |
 
-Dell implements a robust combat damage receiver on `PlayerShip`. ASUS provides the visual HUD bar and revive loop.
+*Summary: Enemies set `collision_layer = 4`, `collision_mask = 3` (or 9). Reflectors set `collision_layer = 16`, `collision_mask = 0`.*
+
+---
+
+## 3. Damage Protocol & Signal Signatures
+
+### Projectile-to-Enemy Damage Call
+When the Dell's projectile detects a collision with an enemy collider:
 
 ```gdscript
-# Signals emitted by Player
-signal health_changed(current_hp: int, max_hp: int)
-signal player_damaged(damage: int, hit_source: Node)
-signal player_healed(amount: int)
-signal invulnerability_changed(is_invulnerable: bool)
-signal player_died()
-
-# Methods callable by ASUS or combat entities
-func take_damage(amount: int, hit_source: Node = null) -> void
-func heal(amount: int) -> void
-func get_health() -> int
-func get_max_health() -> int
-func is_alive() -> bool
-func set_invulnerable(duration: float) -> void
+# Primary damage interface (full vector context)
+if collider.has_method("take_damage"):
+    collider.take_damage(damage_amount, hit_normal, hit_point)
+# Fallback duck-typing alternatives supported by EnemyBase:
+elif collider.has_method("hit"):
+    collider.hit(damage_amount)
+elif collider.has_method("apply_damage"):
+    collider.apply_damage(damage_amount)
+elif collider.has_method("on_hit"):
+    collider.on_hit(damage_amount)
 ```
 
-*Contract Rules:*
-* When `amount <= 0`, `take_damage()` does nothing.
-* Player has a default invulnerability window (`i_frames = 1.0s`) with blinking visual feedback to prevent multi-hit frame snagging.
-* ASUS's healing drops call `player.heal(amount)`.
-
----
-
-### 2.2 Enemy Damage Contract (Target: Nodes in group `"enemies"`)
-
-All enemies inherit from `EnemyBase` (`scripts/enemy_base.gd`).
-
+### Enemy Signals
+Every enemy emits three decoupled Godot signals:
 ```gdscript
-# Signals emitted by EnemyBase
 signal health_changed(current_hp: int, max_hp: int)
 signal hit_taken(damage: int, hit_normal: Vector2)
-signal destroyed(score_reward: int, death_position: Vector2)
-
-# Methods on EnemyBase
-func take_damage(amount: int, combo_multiplier: Variant = 1, hit_point: Vector2 = Vector2.ZERO) -> void
-func die(combo_multiplier: int = 1) -> void
+signal destroyed(score: int, death_position: Vector2)
 ```
 
-*Contract Rules:*
-* Dell projectiles call `take_damage(damage, ricochet_combo, collision.get_position())`.
-* When destroyed, the enemy awards `score_value * max(1, combo)` to `GameManager` and emits `destroyed`.
-* ASUS collectible drops connect to `enemy.destroyed` to spawn scrap or energy cores at `death_position`.
+- When connecting to Score / Combo UI in Main Scene:
+  ```gdscript
+  enemy.destroyed.connect(_on_enemy_destroyed)
+  
+  func _on_enemy_destroyed(score_value: int, death_pos: Vector2) -> void:
+      score += score_value
+      combo += 1
+  ```
 
 ---
 
-### 2.3 Reflective Surface Contract (Target: Nodes in group `"reflective"`)
+## 4. Reflector Ricochet Protocol
 
-Reflective geometry redirects energy bolts using mathematical vector reflection.
+When the Dell's projectile hits a surface:
 
 ```gdscript
-# Required group
-add_to_group("reflective")
-
-# Required method called by EnergyProjectile upon collision
-func on_ricochet(impact_point: Vector2, normal: Vector2) -> void
+# Check if hit collider is a reflector
+if collider.is_in_group("reflectors") or collider.get_meta("is_reflective", false):
+    var incoming_dir: Vector2 = projectile_velocity.normalized()
+    var bounce_normal: Vector2 = collision_info.get_normal()
+    var reflected_dir: Vector2 = incoming_dir.bounce(bounce_normal)
+    
+    # Notify reflector to trigger contact flash VFX
+    if collider.has_method("on_ricochet"):
+        collider.on_ricochet(collision_info.get_position(), bounce_normal)
+    
+    # Redirect projectile velocity along reflected direction
+    projectile_velocity = reflected_dir * speed
 ```
-
-*Contract Rules:*
-* `normal` is the collision normal vector provided by Godot physics `Vector2.bounce(normal)`.
-* Reflectors pulse visually and spawn ricochet particle flashes.
 
 ---
 
-### 2.4 Round & Encounter Manager Contract (`scripts/round_manager.gd`)
+## 5. Master Asset Manifest
 
-Dell provides `RoundManager` as a singleton or scene node managing combat rounds.
-
-```gdscript
-# Signals emitted by RoundManager
-signal round_started(round_index: int, round_name: String, time_limit: float)
-signal wave_started(wave_index: int, total_waves: int)
-signal enemy_count_changed(remaining: int, total: int)
-signal round_time_tick(time_remaining: float)
-signal wave_cleared(wave_index: int)
-signal round_victory(round_index: int, total_score: int)
-signal round_defeat(reason: String)
-
-# Methods callable by ASUS UI
-func start_round(round_index: int) -> void
-func pause_round() -> void
-func resume_round() -> void
-func restart_current_round() -> void
-func get_current_round_info() -> Dictionary
-```
-
-*Contract Rules:*
-* ASUS mission briefing UI listens for `round_started`, displays briefing text, and calls `start_round()` or `resume_round()`.
-* ASUS game-over/revive UI listens for `round_defeat`, handles player revival currency/tokens, and calls `restart_current_round()` or `resume_round()`.
+| Filename | Dimensions | Intended Engine Use | Frame Slice Info |
+| :--- | :---: | :--- | :--- |
+| `player_ship.png` | 48×32 | Player Ship default visual | Single static frame |
+| `player_ship_sheet.png` | 192×32 | Player Ship animated thruster | 4 frames @ 48×32 (10 FPS) |
+| `enemy_drone_basic.png` | 32×32 | Basic Drone default visual | Single static frame |
+| `enemy_drone_basic_sheet.png` | 128×32 | Basic Drone pulsing core | 4 frames @ 32×32 (6 FPS) |
+| `enemy_fast.png` | 32×32 | Fast Interceptor default visual | Single static frame |
+| `enemy_fast_sheet.png` | 128×32 | Fast Interceptor micro-jets | 4 frames @ 32×32 (10 FPS) |
+| `enemy_heavy.png` | 48×48 | Heavy Dreadnought default visual | Single static frame |
+| `enemy_heavy_sheet.png` | 192×48 | Heavy Dreadnought reactor & vents | 4 frames @ 48×48 (6 FPS) |
+| `reflector_angled_45.png` | 32×32 | 45° diagonal mirror (Bottom-Left to Top-Right) | Single static frame |
+| `reflector_angled_135.png`| 32×32 | 135° diagonal mirror (Top-Left to Bottom-Right) | Single static frame |
+| `reflector_bar_h.png` | 32×16 | Horizontal surface bounce barrier | Single static frame |
+| `reflector_bar_v.png` | 16×32 | Vertical surface bounce barrier | Single static frame |
+| `projectile_laser.png` | 20×8 | Player laser bolt sprite | Single static frame |
+| `impact_spark_sheet.png` | 128×32 | Projectile impact spark VFX | 4 frames @ 32×32 (16 FPS, no loop) |
+| `ricochet_flash.png` | 32×32 | Bounce contact point flare | Single static frame (0.15s fade) |
+| `enemy_explode_sheet.png` | 128×32 | Enemy death explosion VFX | 4 frames @ 32×32 (12 FPS, no loop) |
+| `showcase_pack_preview.png`| 360×200 | Visual reference & palette verification | Full reference sheet |
 
 ---
 
-### 2.5 Boss Interface Contract (Target: Boss nodes in group `"boss"`)
+## 6. Integration Step Checklist (Once Baseline is Pulled)
 
-```gdscript
-# Signals emitted by Boss
-signal boss_spawned(boss_name: String, max_hp: int)
-signal boss_health_changed(current_hp: int, max_hp: int)
-signal boss_phase_changed(phase_number: int, phase_name: String)
-signal boss_defeated(score_reward: int)
-```
+### Step 1: Copy Assets
+Copy all subfolders in `romr_prep/assets/` to `res://assets/`:
+- `res://assets/player/`
+- `res://assets/enemies/`
+- `res://assets/environment/`
+- `res://assets/vfx/`
 
-*Contract Rules:*
-* ASUS boss health bar overlay connects to `boss_health_changed` and `boss_phase_changed`.
+### Step 2: Copy Scenes & Scripts
+Copy all subfolders in `romr_prep/scenes/` to `res://scenes/`:
+- `res://scenes/enemies/` (`enemy_base.gd`, `enemy_drone.gd`, `enemy_drone.tscn`, `enemy_fast.gd`, `enemy_fast.tscn`, `enemy_heavy.gd`, `enemy_heavy.tscn`)
+- `res://scenes/environment/` (`reflector_surface.gd`, `reflector_45.tscn`, `reflector_135.tscn`, `reflector_bar_h.tscn`, `reflector_bar_v.tscn`)
+- `res://scenes/vfx/` (`enemy_explosion.gd`, `enemy_explosion.tscn`, `impact_vfx.gd`, `impact_vfx.tscn`, `ricochet_flash.gd`, `ricochet_flash.tscn`)
+
+### Step 3: Configure Project Settings (in `project.godot`)
+1. **Texture Filtering:** Set `rendering/textures/canvas_textures/default_texture_filter = 0` (Nearest) to ensure all sprites render with 0 blur.
+2. **Layer Names:**
+   - Layer 1: World
+   - Layer 2: Player
+   - Layer 3: Enemies
+   - Layer 4: Player Projectiles
+   - Layer 5: Reflectors
+
+### Step 4: Verification Tests to Perform After Integration
+1. **Spawn Enemy:** Instantiate `enemy_drone.tscn` into the main gameplay scene.
+2. **Laser Hit Test:** Fire player projectile at drone. Verify white hit-flash occurs, and enemy HP drops.
+3. **Destruction Test:** Fire 3 shots at drone. Verify it explodes into shards (`enemy_explosion.tscn`) and emits `destroyed(100, position)`.
+4. **Ricochet Test:** Place `reflector_45.tscn` in projectile path. Shoot horizontally at reflector face. Verify beam ricochets 90° upward and spawns contact flare.
+5. **Ricochet-Kill Test:** Angle reflector so the ricocheting beam hits an enemy drone behind cover. Confirm damage registers on bounced hit.
 
 ---
 
-### 2.6 Campaign Data & Narrative Contract (`scripts/campaign_data.gd`)
+## 7. Player Health, Damage, and Death Interface (Dell & ASUS)
 
-Dell exposes campaign level definitions as structured data:
+### Player Node Reference
+Player character scene: `res://scenes/player.tscn`  
+Player script: `res://scripts/player.gd`  
+Class: `PlayerShip` (group: `"player"`)
+
+### Health Methods Called by Dell Systems
+When an enemy, projectile, or hazard damages the player:
 ```gdscript
-CampaignData.get_act_levels(act_index: int) -> Array[Dictionary]
+var player = get_tree().get_first_node_in_group("player")
+if player and player.has_method("take_damage"):
+    # Returns true if damage was applied, false if blocked by invulnerability or dead
+    var hit_success: bool = player.take_damage(damage_amount, self)
 ```
-Each level entry includes:
-* `id`: String identifier (e.g. `"1-1"`, `"1-boss"`)
-* `title`: Mission name
-* `briefing`: Narrative briefing string (from Story Bible)
-* `dialogue_hooks`: Array of speaker/text pairs for ASUS dialogue display
-* `target_score`: Par score for grade
-* `time_limit`: Seconds allowed
+
+### Health Signals Emitted by Player
+```gdscript
+signal health_changed(current_hp: int, max_hp: int)
+signal player_damaged(damage: int)
+signal player_healed(amount: int)
+signal player_died()
+signal invulnerability_changed(is_invulnerable: bool)
+```
+
+### Player Healing Method
+```gdscript
+# Returns actual health restored (capped at max_hp):
+var restored: int = player.heal(heal_amount)
+```
+
+---
+
+## 8. Collectible Pickups & Drops Interface
+
+### Spawn API (Callable from Dell Enemy/Combat Code)
+Dell enemies or round managers can spawn pickups on death without scene coupling:
+```gdscript
+# In enemy death logic:
+var gm = get_node_or_null("/root/GameManager")
+if gm and gm.has_method("spawn_pickup"):
+    # Drop nanocell healing capsule (e.g. 25% drop chance):
+    if randf() < 0.25:
+        gm.spawn_pickup(gm.PickupType.NANOCELL, global_position)
+    # Drop vector fragment currency:
+    gm.spawn_pickup(gm.PickupType.FRAGMENT, global_position, 15)
+```
+
+### Pickup Collision Matrix
+* Pickups reside on collision layer 1 or Area2D monitoring layer 2 (Player).
+* Pickups do not collide with reflectors or enemies.
+
+---
+
+## 9. Currency, Economy, and Reward Protocol
+
+### Centralized Reward Award Call
+```gdscript
+var gm = get_node_or_null("/root/GameManager")
+if gm and gm.has_method("award_currency"):
+    # transaction_id ensures duplicate signals never award multiple times
+    gm.award_currency(amount: int, transaction_id: String)
+```
+
+### Signals
+```gdscript
+signal currency_updated(new_balance: int)
+```
+
+---
+
+## 10. Combat Wave & Boss Synchronization Events
+
+Dell's upcoming wave controller and boss encounters should emit the following signals to synchronize with ASUS HUD and Story systems:
+
+```gdscript
+# Emitted when a round/wave starts:
+signal wave_started(wave_number: int, wave_name: String)
+
+# Emitted when a round/wave is completed:
+signal wave_completed(wave_number: int, reward_fragments: int)
+
+# Emitted when a boss appears (pauses background music, triggers holo-transmission):
+signal boss_spawned(boss_name: String, boss_max_hp: int)
+
+# Emitted when a boss is defeated:
+signal boss_defeated(boss_name: String, reward_fragments: int)
+```
+
+---
+
+## 11. Story & Mission Progression Hooks
+
+```gdscript
+# Request a mission briefing dialog overlay:
+GameManager.request_briefing(mission_id: String)
+
+# Request story transmission dialogue:
+GameManager.trigger_transmission(transmission_id: String)
+
+# Request campaign ending / victory debrief:
+GameManager.trigger_victory(mission_id: String)
+```
+

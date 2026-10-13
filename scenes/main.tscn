@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/space_environment.gd" id="2_env"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="3_player"]
@@ -8,6 +8,8 @@
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="7_hud"]
 [ext_resource type="PackedScene" path="res://scenes/enemy_drone.tscn" id="8_enemy_drone"]
 [ext_resource type="PackedScene" path="res://scenes/reflector_45.tscn" id="9_reflector_45"]
+[ext_resource type="PackedScene" path="res://scenes/story_dialogue.tscn" id="10_dialogue"]
+[ext_resource type="Script" path="res://scripts/mission_manager.gd" id="11_mission"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_top"]
 normal = Vector2(0, 1)
@@ -56,3 +58,8 @@ position = Vector2(960, 480)
 script = ExtResource("6_spawner")
 
 [node name="HUD" parent="." instance=ExtResource("7_hud")]
+
+[node name="StoryDialogue" parent="." instance=ExtResource("10_dialogue")]
+
+[node name="MissionManager" type="Node" parent="."]
+script = ExtResource("11_mission")
