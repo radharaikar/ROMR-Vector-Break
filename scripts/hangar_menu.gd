@@ -4,7 +4,7 @@ extends Control
 # ==============================================================================
 # VECTOR//BREAK — HANGAR / MAIN HUB MENU
 # Home menu offering Campaign Continue, New Game (with Prologue),
-# Hangar Store / Outfitter, Mission Briefings, Credits, and Quit.
+# Hangar Store / Outfitter, 5-Act Mission Matrix, Credits, and Quit.
 # ==============================================================================
 
 @onready var continue_btn: Button = $Margin/HBox/NavVBox/ContinueBtn
@@ -22,20 +22,34 @@ extends Control
 @onready var credits_modal: PanelContainer = $CreditsModal
 @onready var close_credits_btn: Button = $CreditsModal/VBox/CloseCreditsBtn
 
+@onready var campaign_modal: PanelContainer = $CampaignModal
+@onready var launch_act1_btn: Button = $CampaignModal/Margin/VBox/Scroll/ActList/Act1Card/M/VB/LaunchAct1Btn
+@onready var close_campaign_btn: Button = $CampaignModal/Margin/VBox/CloseCampaignBtn
+
 func _ready() -> void:
 	SaveManager.load_data()
 	_update_hub_display()
 	
-	if continue_btn: continue_btn.pressed.connect(_on_continue_pressed)
+	var has_save = FileAccess.file_exists(SaveManager.SAVE_PATH)
+	if continue_btn:
+		continue_btn.disabled = not has_save
+		continue_btn.pressed.connect(_on_continue_pressed)
+	
 	if new_game_btn: new_game_btn.pressed.connect(_on_new_game_pressed)
 	if store_btn: store_btn.pressed.connect(_on_store_pressed)
 	if briefing_btn: briefing_btn.pressed.connect(_on_briefing_pressed)
 	if credits_btn: credits_btn.pressed.connect(_on_credits_pressed)
 	if quit_btn: quit_btn.pressed.connect(_on_quit_pressed)
-	if close_credits_btn: close_credits_btn.pressed.connect(func(): credits_modal.visible = false)
 	
-	if credits_modal:
-		credits_modal.visible = false
+	if close_credits_btn:
+		close_credits_btn.pressed.connect(func(): if credits_modal: credits_modal.visible = false)
+	
+	if launch_act1_btn: launch_act1_btn.pressed.connect(_on_launch_act1_pressed)
+	if close_campaign_btn:
+		close_campaign_btn.pressed.connect(func(): if campaign_modal: campaign_modal.visible = false)
+	
+	if credits_modal: credits_modal.visible = false
+	if campaign_modal: campaign_modal.visible = false
 
 func _update_hub_display() -> void:
 	if currency_label:
@@ -61,27 +75,23 @@ func _update_hub_display() -> void:
 			ship_sprite.texture = load(tex_path)
 
 func _on_continue_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/main.tscn")
+	get_tree().change_scene_to_file("res://scenes/act1_mission.tscn")
 
 func _on_new_game_pressed() -> void:
 	SaveManager.reset_data()
 	SaveManager.add_currency(50) # Starting stipend
 	_update_hub_display()
-	
-	# Play Prologue transmission, then launch main scene
-	if dialogue_layer:
-		dialogue_layer.play_sequence("prologue", func():
-			get_tree().change_scene_to_file("res://scenes/main.tscn")
-		)
-	else:
-		get_tree().change_scene_to_file("res://scenes/main.tscn")
+	get_tree().change_scene_to_file("res://scenes/prologue.tscn")
 
 func _on_store_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/store_menu.tscn")
 
 func _on_briefing_pressed() -> void:
-	if dialogue_layer:
-		dialogue_layer.play_sequence("act1_briefing")
+	if campaign_modal:
+		campaign_modal.visible = true
+
+func _on_launch_act1_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/act1_mission.tscn")
 
 func _on_credits_pressed() -> void:
 	if credits_modal:

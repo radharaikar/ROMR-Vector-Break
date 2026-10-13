@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/hud.gd" id="1_hud"]
 
@@ -65,6 +65,18 @@ corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boss_fill"]
+bg_color = Color(1, 0.2, 0.45, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.6, 0.8, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
 bg_color = Color(0.03, 0.04, 0.1, 0.95)
 border_width_left = 2
@@ -77,7 +89,20 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause"]
+bg_color = Color(0.02, 0.03, 0.09, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.9, 1, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [node name="HUD" type="CanvasLayer"]
+process_mode = 3
 script = ExtResource("1_hud")
 
 [node name="Control" type="Control" parent="."]
@@ -213,6 +238,42 @@ theme_override_font_sizes/font_size = 12
 text = "[ ! CRITICAL DAMAGE ! ]"
 horizontal_alignment = 1
 
+[node name="BossHealthMargin" type="MarginContainer" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -240.0
+offset_top = 16.0
+offset_right = 240.0
+offset_bottom = 74.0
+grow_horizontal = 2
+
+[node name="BossPanel" type="PanelContainer" parent="Control/BossHealthMargin"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud")
+
+[node name="VBox" type="VBoxContainer" parent="Control/BossHealthMargin/BossPanel"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="BossTitleLabel" type="Label" parent="Control/BossHealthMargin/BossPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.5, 1)
+theme_override_font_sizes/font_size = 14
+text = "FLAGSHIP: COMMANDER SERIN // THE GATEKEEPER"
+horizontal_alignment = 1
+
+[node name="BossProgressBar" type="ProgressBar" parent="Control/BossHealthMargin/BossPanel/VBox"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_health_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_boss_fill")
+max_value = 500.0
+value = 500.0
+show_percentage = false
+
 [node name="CenterBanner" type="PanelContainer" parent="Control"]
 visible = false
 layout_mode = 1
@@ -315,3 +376,138 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.8, 1)
 theme_override_font_sizes/font_size = 14
 text = "[ RETURN TO HANGAR ]"
+
+[node name="PauseOverlay" type="Control" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="Control/PauseOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.025, 0.07, 0.88)
+
+[node name="Center" type="CenterContainer" parent="Control/PauseOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PausePanel" type="PanelContainer" parent="Control/PauseOverlay/Center"]
+custom_minimum_size = Vector2(440, 320)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pause")
+
+[node name="Margin" type="MarginContainer" parent="Control/PauseOverlay/Center/PausePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="Control/PauseOverlay/Center/PausePanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PauseTitle" type="Label" parent="Control/PauseOverlay/Center/PausePanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "TACTICAL SIMULATION PAUSED"
+horizontal_alignment = 1
+
+[node name="PauseSub" type="Label" parent="Control/PauseOverlay/Center/PausePanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.95, 1)
+theme_override_font_sizes/font_size = 13
+text = "Press [ESCAPE] to return to combat."
+horizontal_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="Control/PauseOverlay/Center/PausePanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 15
+text = "[ RESUME MISSION ]"
+
+[node name="RestartButton" type="Button" parent="Control/PauseOverlay/Center/PausePanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ RESTART SECTOR ]"
+
+[node name="ControlsButton" type="Button" parent="Control/PauseOverlay/Center/PausePanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ CONTROLS & MANUAL ]"
+
+[node name="HangarAbortButton" type="Button" parent="Control/PauseOverlay/Center/PausePanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.35, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ ABORT TO HANGAR ]"
+
+[node name="ControlsModal" type="PanelContainer" parent="Control/PauseOverlay"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -180.0
+offset_right = 260.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud")
+
+[node name="Margin" type="MarginContainer" parent="Control/PauseOverlay/ControlsModal"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="Control/PauseOverlay/ControlsModal/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Control/PauseOverlay/ControlsModal/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "FLIGHT MANUAL & CONTROLS"
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="Control/PauseOverlay/ControlsModal/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 13
+text = "• MOVE: [W, A, S, D] or [Arrow Keys]
+• AIM: Mouse Reticle (Cyan Preview Line)
+• FIRE: [Left Click] or [Spacebar]
+• RICOCHET: Direct shots hit reflectors at 45° / 135° and bounce 90°.
+• SHIELD BYPASS: Heavy Drones deflect frontal fire. Bounce shots behind them to destroy!
+• PAUSE: [Escape]"
+autowrap_mode = 3
+
+[node name="CloseControlsBtn" type="Button" parent="Control/PauseOverlay/ControlsModal/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.9, 1, 1)
+text = "[ CLOSE MANUAL ]"

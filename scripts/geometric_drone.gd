@@ -38,7 +38,7 @@ func _physics_process(delta: float) -> void:
 		base_y = randf_range(120.0, 600.0)
 		global_position.y = base_y
 
-func take_damage(amount: int, combo_multiplier: int = 1) -> void:
+func take_damage(amount: int, combo_multiplier: Variant = 1, _hit_point: Vector2 = Vector2.ZERO) -> void:
 	if is_dead:
 		return
 	
@@ -46,7 +46,10 @@ func take_damage(amount: int, combo_multiplier: int = 1) -> void:
 	_flash_feedback()
 	
 	if health <= 0:
-		_die(combo_multiplier)
+		var mult: int = 1
+		if typeof(combo_multiplier) == TYPE_INT or typeof(combo_multiplier) == TYPE_FLOAT:
+			mult = int(combo_multiplier)
+		_die(mult)
 
 func _flash_feedback() -> void:
 	if sprite:
@@ -55,12 +58,18 @@ func _flash_feedback() -> void:
 		tween.tween_property(sprite, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.18)
 
 func _die(combo_multiplier: int) -> void:
+	if is_dead:
+		return
 	is_dead = true
 	
 	var gm = get_node_or_null("/root/GameManager")
 	if gm:
 		gm.register_hit(combo_multiplier)
 		gm.add_score(100, combo_multiplier)
+		if gm.has_method("award_currency"):
+			gm.award_currency(15, "drone_%d" % get_instance_id())
+		if gm.has_method("spawn_pickup") and randf() < 0.3:
+			gm.spawn_pickup(gm.PickupType.NANOCELL, global_position)
 	
 	# Spawn explosion particles
 	_spawn_explosion()

@@ -1,4 +1,4 @@
-class_name Player
+class_name PlayerShip
 extends CharacterBody2D
 
 ## Signals for HUD and gameplay synchronization

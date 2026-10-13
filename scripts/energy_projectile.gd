@@ -60,13 +60,28 @@ func _physics_process(delta: float) -> void:
 			# Ignore player to prevent firing self-hits in tight maneuvers
 			pass
 		elif collider and collider.has_method("take_damage"):
-			collider.take_damage(damage, ricochet_combo, collision.get_position())
+			_deliver_damage(collider, damage, ricochet_combo, collision.get_position())
 			_spawn_sparks(collision.get_position(), -direction, Color(1.0, 0.3, 0.8))
 			_destroy()
 		else:
 			# Non-reflective obstacle or boundary
 			_spawn_sparks(collision.get_position(), normal, Color(0.3, 0.7, 1.0))
 			_destroy()
+
+func _deliver_damage(target: Object, dmg: int, combo: int, hit_pos: Vector2) -> void:
+	if not target or not target.has_method("take_damage"):
+		return
+	var arg_count: int = 1
+	for m in target.get_method_list():
+		if m["name"] == "take_damage":
+			arg_count = m["args"].size()
+			break
+	if arg_count >= 3:
+		target.take_damage(dmg, combo, hit_pos)
+	elif arg_count == 2:
+		target.take_damage(dmg, combo)
+	else:
+		target.take_damage(dmg)
 
 func _draw() -> void:
 	# Draw electric cyan laser trail behind projectile

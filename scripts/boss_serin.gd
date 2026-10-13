@@ -35,6 +35,14 @@ func _ready() -> void:
 	emit_signal("boss_spawned", boss_name, max_health)
 	emit_signal("boss_health_changed", current_health, max_health)
 	emit_signal("boss_phase_changed", 1, "PHASE I: TARGET LOCK")
+	
+	# Hook HUD boss health bar if present
+	var hud = get_tree().get_first_node_in_group("hud")
+	if not hud and get_parent():
+		hud = get_parent().get_node_or_null("HUD")
+	if hud and hud.has_method("show_boss_health"):
+		hud.show_boss_health(boss_name, max_health)
+		boss_health_changed.connect(hud.update_boss_health)
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
@@ -181,6 +189,12 @@ func _die(combo_multiplier: int = 1) -> void:
 		return
 	is_dead = true
 	emit_signal("boss_defeated", score_reward)
+	
+	var hud = get_tree().get_first_node_in_group("hud")
+	if not hud and get_parent():
+		hud = get_parent().get_node_or_null("HUD")
+	if hud and hud.has_method("hide_boss_health"):
+		hud.hide_boss_health()
 	
 	var gm = get_node_or_null("/root/GameManager")
 	if gm:

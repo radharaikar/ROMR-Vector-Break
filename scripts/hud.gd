@@ -1,10 +1,11 @@
-class_name HUD
+class_name ArcadeHUD
 extends CanvasLayer
 
 # ==============================================================================
 # VECTOR//BREAK — COMPREHENSIVE HUD CONTROLLER
 # Displays real-time Hull Integrity, Score, Combo, Currency (Fragments),
-# Reconstruct Cores, Round/Wave Status, Mission Banners, and Defeat/Revive Modal.
+# Reconstruct Cores, Round/Wave Status, Boss Health Bar, Mission Banners,
+# Pause Menu (with Controls Manual), and Defeat/Revive Modal.
 # ==============================================================================
 
 @onready var title_label: Label = get_node_or_null("Control/TitleMargin/VBox/TitleLabel")
@@ -19,10 +20,15 @@ extends CanvasLayer
 @onready var banner_label: Label = get_node_or_null("Control/CenterBanner/BannerLabel")
 @onready var center_banner: Control = get_node_or_null("Control/CenterBanner")
 
-# Health Bar UI
+# Player Health Bar UI
 @onready var health_bar: ProgressBar = get_node_or_null("Control/HealthMargin/HealthPanel/VBoxContainer/HealthProgressBar")
 @onready var health_label: Label = get_node_or_null("Control/HealthMargin/HealthPanel/VBoxContainer/HealthHeader/HealthLabel")
 @onready var critical_warning: Label = get_node_or_null("Control/HealthMargin/HealthPanel/VBoxContainer/CriticalWarning")
+
+# Boss Health Bar UI
+@onready var boss_health_margin: Control = get_node_or_null("Control/BossHealthMargin")
+@onready var boss_title_label: Label = get_node_or_null("Control/BossHealthMargin/BossPanel/VBox/BossTitleLabel")
+@onready var boss_progress_bar: ProgressBar = get_node_or_null("Control/BossHealthMargin/BossPanel/VBox/BossProgressBar")
 
 # Defeat / Second Chance Modal
 @onready var defeat_overlay: Control = get_node_or_null("Control/DefeatOverlay")
@@ -30,9 +36,20 @@ extends CanvasLayer
 @onready var retry_button: Button = get_node_or_null("Control/DefeatOverlay/CenterContainer/DefeatPanel/VBox/ButtonContainer/RetryButton")
 @onready var hangar_button: Button = get_node_or_null("Control/DefeatOverlay/CenterContainer/DefeatPanel/VBox/ButtonContainer/HangarButton")
 
+# Pause Menu Overlay
+@onready var pause_overlay: Control = get_node_or_null("Control/PauseOverlay")
+@onready var resume_btn: Button = get_node_or_null("Control/PauseOverlay/Center/PausePanel/Margin/VBox/ResumeButton")
+@onready var restart_btn: Button = get_node_or_null("Control/PauseOverlay/Center/PausePanel/Margin/VBox/RestartButton")
+@onready var controls_btn: Button = get_node_or_null("Control/PauseOverlay/Center/PausePanel/Margin/VBox/ControlsButton")
+@onready var hangar_abort_btn: Button = get_node_or_null("Control/PauseOverlay/Center/PausePanel/Margin/VBox/HangarAbortButton")
+@onready var controls_modal: Control = get_node_or_null("Control/PauseOverlay/ControlsModal")
+@onready var close_controls_btn: Button = get_node_or_null("Control/PauseOverlay/ControlsModal/Margin/VBox/CloseControlsBtn")
+
 var _warning_pulse_time: float = 0.0
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	
 	var gm = get_node_or_null("/root/GameManager")
 	if gm:
 		if gm.has_signal("score_updated"):
@@ -55,15 +72,44 @@ func _ready() -> void:
 		_hook_round_manager(rm)
 	
 	# Connect defeat buttons
-	if revive_button:
-		revive_button.pressed.connect(_on_revive_pressed)
-	if retry_button:
-		retry_button.pressed.connect(_on_retry_pressed)
-	if hangar_button:
-		hangar_button.pressed.connect(_on_hangar_pressed)
+	if revive_button: revive_button.pressed.connect(_on_revive_pressed)
+	if retry_button: retry_button.pressed.connect(_on_retry_pressed)
+	if hangar_button: hangar_button.pressed.connect(_on_hangar_pressed)
 	
-	if defeat_overlay:
-		defeat_overlay.visible = false
+	# Connect pause buttons
+	if resume_btn: resume_btn.pressed.connect(_resume_game)
+	if restart_btn: restart_btn.pressed.connect(_on_retry_pressed)
+	if controls_btn: controls_btn.pressed.connect(func(): if controls_modal: controls_modal.visible = true)
+	if close_controls_btn: close_controls_btn.pressed.connect(func(): if controls_modal: controls_modal.visible = false)
+	if hangar_abort_btn: hangar_abort_btn.pressed.connect(_on_hangar_pressed)
+	
+	if defeat_overlay: defeat_overlay.visible = false
+	if pause_overlay: pause_overlay.visible = false
+	if boss_health_margin: boss_health_margin.visible = false
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_ESCAPE:
+			_toggle_pause()
+			get_viewport().set_input_as_handled()
+
+func _toggle_pause() -> void:
+	if defeat_overlay and defeat_overlay.visible:
+		return # Do not toggle pause if defeat screen is visible
+		
+	var is_paused = not get_tree().paused
+	get_tree().paused = is_paused
+	if pause_overlay:
+		pause_overlay.visible = is_paused
+	if controls_modal:
+		controls_modal.visible = false
+
+func _resume_game() -> void:
+	get_tree().paused = false
+	if pause_overlay:
+		pause_overlay.visible = false
+	if controls_modal:
+		controls_modal.visible = false
 
 func _process(delta: float) -> void:
 	if critical_warning and critical_warning.visible:
@@ -131,6 +177,26 @@ func _on_health_changed(current: int, maximum: int) -> void:
 	if critical_warning:
 		critical_warning.visible = (health_ratio <= 0.25 and current > 0)
 
+func show_boss_health(boss_name: String, max_hp: int) -> void:
+	if boss_health_margin:
+		boss_health_margin.visible = true
+	if boss_title_label:
+		boss_title_label.text = "FLAGSHIP: " + boss_name
+	if boss_progress_bar:
+		boss_progress_bar.max_value = max_hp
+		boss_progress_bar.value = max_hp
+
+func update_boss_health(current: int, maximum: int) -> void:
+	if boss_health_margin and not boss_health_margin.visible:
+		boss_health_margin.visible = true
+	if boss_progress_bar:
+		boss_progress_bar.max_value = maximum
+		boss_progress_bar.value = current
+
+func hide_boss_health() -> void:
+	if boss_health_margin:
+		boss_health_margin.visible = false
+
 func _on_round_started(_idx: int, round_name: String, _time: float) -> void:
 	show_banner(round_name, Color(0.2, 0.9, 1.0))
 	if title_label:
@@ -156,6 +222,7 @@ func _on_enemy_count_changed(remaining: int, _total: int) -> void:
 
 func _on_victory(_round_idx: int, _score: int) -> void:
 	show_banner("SECTOR SECURED — VICTORY", Color(0.3, 1.0, 0.5))
+	hide_boss_health()
 
 func _on_defeat(reason: String) -> void:
 	show_banner("MISSION FAILED: " + reason, Color(1.0, 0.25, 0.2))
@@ -206,9 +273,11 @@ func _on_revive_pressed() -> void:
 			_update_cores_display()
 
 func _on_retry_pressed() -> void:
+	get_tree().paused = false
 	get_tree().reload_current_scene()
 
 func _on_hangar_pressed() -> void:
+	get_tree().paused = false
 	if ResourceLoader.exists("res://scenes/hangar_menu.tscn"):
 		get_tree().change_scene_to_file("res://scenes/hangar_menu.tscn")
 	else:

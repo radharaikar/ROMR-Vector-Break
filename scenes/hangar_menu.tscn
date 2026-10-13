@@ -221,3 +221,188 @@ custom_minimum_size = Vector2(160, 36)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "CLOSE [X]"
+
+[node name="CampaignModal" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -240.0
+offset_right = 340.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="CampaignModal"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="CampaignModal/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CampaignTitle" type="Label" parent="CampaignModal/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "CAMPAIGN ARCHIVE // 5 ACT MISSION MATRIX"
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="CampaignModal/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ActList" type="VBoxContainer" parent="CampaignModal/Margin/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Act1Card" type="PanelContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList"]
+layout_mode = 2
+
+[node name="M" type="MarginContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act1Card"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="VB" type="VBoxContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act1Card/M"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="T" type="Label" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act1Card/M/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 14
+text = "ACT I — GHOSTS IN THE SIGNAL [PLAYABLE // UNLOCKED]"
+
+[node name="D" type="Label" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act1Card/M/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.95, 1)
+theme_override_font_sizes/font_size = 12
+text = "Outer Graveyard. Penetrate automated defense perimeter. Face Commander Serin."
+
+[node name="LaunchAct1Btn" type="Button" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act1Card/M/VB"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "[ LAUNCH MISSION: ACT I >> ]"
+
+[node name="Act2Card" type="PanelContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList"]
+layout_mode = 2
+
+[node name="M" type="MarginContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act2Card"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="VB" type="VBoxContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act2Card/M"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="T" type="Label" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act2Card/M/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.65, 0.75, 1)
+theme_override_font_sizes/font_size = 14
+text = "ACT II — THE ONES LEFT BEHIND [LOCKED]"
+
+[node name="D" type="Label" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act2Card/M/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.65, 1)
+theme_override_font_sizes/font_size = 12
+text = "Ashen Colonies. Search for survivors of the Vesper cataclysm and evade the Huntsman."
+
+[node name="Act3Card" type="PanelContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList"]
+layout_mode = 2
+
+[node name="M" type="MarginContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act3Card"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="VB" type="VBoxContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act3Card/M"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="T" type="Label" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act3Card/M/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.65, 0.75, 1)
+theme_override_font_sizes/font_size = 14
+text = "ACT III — THE LIVING CIRCUIT [LOCKED]"
+
+[node name="D" type="Label" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act3Card/M/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.65, 1)
+theme_override_font_sizes/font_size = 12
+text = "AXIOM Research Division. Infiltrate bio-vector labs and face the Warden."
+
+[node name="Act4Card" type="PanelContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList"]
+layout_mode = 2
+
+[node name="M" type="MarginContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act4Card"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="VB" type="VBoxContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act4Card/M"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="T" type="Label" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act4Card/M/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.65, 0.75, 1)
+theme_override_font_sizes/font_size = 14
+text = "ACT IV — THE PERFECT WAR [LOCKED]"
+
+[node name="D" type="Label" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act4Card/M/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.65, 1)
+theme_override_font_sizes/font_size = 12
+text = "AXIOM Citadel. Confront Lucien Vale and the ORACLE tactical network."
+
+[node name="Act5Card" type="PanelContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList"]
+layout_mode = 2
+
+[node name="M" type="MarginContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act5Card"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="VB" type="VBoxContainer" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act5Card/M"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="T" type="Label" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act5Card/M/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.65, 0.75, 1)
+theme_override_font_sizes/font_size = 14
+text = "ACT V — THE LAST TRAJECTORY [LOCKED]"
+
+[node name="D" type="Label" parent="CampaignModal/Margin/VBox/Scroll/ActList/Act5Card/M/VB"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.55, 0.65, 1)
+theme_override_font_sizes/font_size = 12
+text = "Heart of the Vector Engine. The final calculation and Mira's freedom."
+
+[node name="CloseCampaignBtn" type="Button" parent="CampaignModal/Margin/VBox"]
+custom_minimum_size = Vector2(160, 36)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "CLOSE [X]"

@@ -1,0 +1,175 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/act1_mission.gd" id="1_act1"]
+[ext_resource type="Script" path="res://scripts/space_environment.gd" id="2_env"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://scenes/reflective_surface.tscn" id="4_refl"]
+[ext_resource type="PackedScene" path="res://scenes/reflector_45.tscn" id="5_reflector_45"]
+[ext_resource type="PackedScene" path="res://scenes/moving_reflector.tscn" id="6_moving_refl"]
+[ext_resource type="PackedScene" path="res://scenes/laser_gate.tscn" id="7_laser_gate"]
+[ext_resource type="Script" path="res://scripts/round_manager.gd" id="8_round_mgr"]
+[ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="9_hud"]
+[ext_resource type="PackedScene" path="res://scenes/story_dialogue.tscn" id="10_dialogue"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_top"]
+normal = Vector2(0, 1)
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_bottom"]
+normal = Vector2(0, -1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_victory"]
+bg_color = Color(0.02, 0.03, 0.09, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.95, 0.6, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="Act1Mission" type="Node2D"]
+script = ExtResource("1_act1")
+
+[node name="SpaceEnvironment" type="Node2D" parent="."]
+script = ExtResource("2_env")
+
+[node name="ArenaBorders" type="StaticBody2D" parent="."]
+collision_layer = 4
+collision_mask = 3
+
+[node name="TopCollision" type="CollisionShape2D" parent="ArenaBorders"]
+position = Vector2(640, 48)
+shape = SubResource("WorldBoundaryShape2D_top")
+
+[node name="BottomCollision" type="CollisionShape2D" parent="ArenaBorders"]
+position = Vector2(640, 672)
+shape = SubResource("WorldBoundaryShape2D_bottom")
+
+[node name="ReflectiveSurfaceLower" parent="." instance=ExtResource("4_refl")]
+position = Vector2(580, 480)
+rotation = -0.785398
+
+[node name="ReflectiveSurfaceUpper" parent="." instance=ExtResource("4_refl")]
+position = Vector2(580, 240)
+rotation = 0.785398
+
+[node name="Reflector45" parent="." instance=ExtResource("5_reflector_45")]
+position = Vector2(750, 480)
+
+[node name="MovingReflector" parent="." instance=ExtResource("6_moving_refl")]
+position = Vector2(880, 360)
+
+[node name="LaserGate" parent="." instance=ExtResource("7_laser_gate")]
+position = Vector2(450, 200)
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector2(160, 360)
+
+[node name="RoundManager" type="Node" parent="." groups=["round_manager"]]
+script = ExtResource("8_round_mgr")
+auto_start_first_round = false
+
+[node name="HUD" parent="." groups=["hud"] instance=ExtResource("9_hud")]
+
+[node name="StoryDialogue" parent="." instance=ExtResource("10_dialogue")]
+
+[node name="VictoryCanvas" type="CanvasLayer" parent="."]
+layer = 4
+
+[node name="VictoryOverlay" type="Control" parent="VictoryCanvas"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="VictoryCanvas/VictoryOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.015, 0.02, 0.06, 0.88)
+
+[node name="Center" type="CenterContainer" parent="VictoryCanvas/VictoryOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="VictoryCanvas/VictoryOverlay/Center"]
+custom_minimum_size = Vector2(520, 340)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_victory")
+
+[node name="Margin" type="MarginContainer" parent="VictoryCanvas/VictoryOverlay/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="VictoryCanvas/VictoryOverlay/Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="VictoryCanvas/VictoryOverlay/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 0.6, 1)
+theme_override_font_sizes/font_size = 22
+text = "SECTOR 01 PURGED // MISSION COMPLETE"
+horizontal_alignment = 1
+
+[node name="Sub" type="Label" parent="VictoryCanvas/VictoryOverlay/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+text = "Outer perimeter defenses broken. Commander Serin's flagship disabled."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ScoreLabel" type="Label" parent="VictoryCanvas/VictoryOverlay/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "FINAL SCORE: 000000"
+horizontal_alignment = 1
+
+[node name="CurrencyLabel" type="Label" parent="VictoryCanvas/VictoryOverlay/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 15
+text = "RECOVERED FRAGMENTS: +150 ◆"
+horizontal_alignment = 1
+
+[node name="UnlockLabel" type="Label" parent="VictoryCanvas/VictoryOverlay/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.35, 0.85, 1)
+theme_override_font_sizes/font_size = 14
+text = "CAMPAIGN PROGRESSION: ACT II [THE ONES LEFT BEHIND] UNLOCKED"
+horizontal_alignment = 1
+
+[node name="Buttons" type="VBoxContainer" parent="VictoryCanvas/VictoryOverlay/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HubButton" type="Button" parent="VictoryCanvas/VictoryOverlay/Center/Panel/Margin/VBox/Buttons"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "[ PROCEED TO HANGAR & OUTFITTER >> ]"
+
+[node name="ReplayButton" type="Button" parent="VictoryCanvas/VictoryOverlay/Center/Panel/Margin/VBox/Buttons"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ REPLAY MISSION ]"
