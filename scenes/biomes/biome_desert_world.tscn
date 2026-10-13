@@ -1,0 +1,40 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/biomes/biome_desert_world.gd" id="1_desert"]
+[ext_resource type="PackedScene" path="res://scenes/biomes/biome_hazard_zone.tscn" id="2_hazard"]
+[ext_resource type="PackedScene" path="res://scenes/reflector_45.tscn" id="3_refl45"]
+[ext_resource type="PackedScene" path="res://scenes/reflective_surface.tscn" id="4_refl"]
+
+[node name="BiomeDesertWorld" type="Node2D"]
+script = ExtResource("1_desert")
+
+[node name="SandstormParticles" type="CPUParticles2D" parent="."]
+position = Vector2(1300, 360)
+amount = 65
+lifetime = 4.5
+preprocess = 2.0
+emission_shape = 3
+emission_rect_extents = Vector2(20, 310)
+spread = 15.0
+gravity = Vector2(-220, 15)
+initial_velocity_min = 80.0
+initial_velocity_max = 160.0
+scale_amount_min = 1.5
+scale_amount_max = 3.5
+color = Color(1, 0.72, 0.25, 0.6)
+
+[node name="HazardZone" parent="." instance=ExtResource("2_hazard")]
+position = Vector2(720, 360)
+hazard_type = "SANDSTORM_HEAT"
+damage = 15
+
+[node name="ReflectorTopPass" parent="." instance=ExtResource("4_refl")]
+position = Vector2(520, 200)
+rotation = 0.523599
+
+[node name="ReflectorBotPass" parent="." instance=ExtResource("4_refl")]
+position = Vector2(520, 520)
+rotation = -0.523599
+
+[node name="ReflectorMesa" parent="." instance=ExtResource("3_refl45")]
+position = Vector2(880, 360)

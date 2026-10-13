@@ -1,0 +1,40 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/biomes/biome_neon_graveyard.gd" id="1_neon"]
+[ext_resource type="PackedScene" path="res://scenes/biomes/biome_hazard_zone.tscn" id="2_hazard"]
+[ext_resource type="PackedScene" path="res://scenes/reflector_45.tscn" id="3_refl45"]
+[ext_resource type="PackedScene" path="res://scenes/reflective_surface.tscn" id="4_refl"]
+
+[node name="BiomeNeonGraveyard" type="Node2D"]
+script = ExtResource("1_neon")
+
+[node name="SpaceDustParticles" type="CPUParticles2D" parent="."]
+position = Vector2(640, 360)
+amount = 40
+lifetime = 6.0
+preprocess = 3.0
+emission_shape = 3
+emission_rect_extents = Vector2(640, 310)
+spread = 180.0
+gravity = Vector2(-8, 2)
+initial_velocity_min = 5.0
+initial_velocity_max = 20.0
+scale_amount_min = 1.0
+scale_amount_max = 2.5
+color = Color(0.2, 0.85, 1, 0.5)
+
+[node name="HazardZone" parent="." instance=ExtResource("2_hazard")]
+position = Vector2(1050, 360)
+hazard_type = "DRIFTING_DEBRIS"
+damage = 10
+
+[node name="ReflectorUpper" parent="." instance=ExtResource("4_refl")]
+position = Vector2(580, 240)
+rotation = 0.785398
+
+[node name="ReflectorLower" parent="." instance=ExtResource("4_refl")]
+position = Vector2(580, 480)
+rotation = -0.785398
+
+[node name="ReflectorCenter" parent="." instance=ExtResource("3_refl45")]
+position = Vector2(750, 480)

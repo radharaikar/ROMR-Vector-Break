@@ -1,0 +1,40 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/biomes/biome_ocean_world.gd" id="1_ocean"]
+[ext_resource type="PackedScene" path="res://scenes/biomes/biome_hazard_zone.tscn" id="2_hazard"]
+[ext_resource type="PackedScene" path="res://scenes/reflector_45.tscn" id="3_refl45"]
+[ext_resource type="PackedScene" path="res://scenes/reflective_surface.tscn" id="4_refl"]
+
+[node name="BiomeOceanWorld" type="Node2D"]
+script = ExtResource("1_ocean")
+
+[node name="BubbleParticles" type="CPUParticles2D" parent="."]
+position = Vector2(640, 670)
+amount = 50
+lifetime = 5.0
+preprocess = 2.5
+emission_shape = 3
+emission_rect_extents = Vector2(640, 20)
+spread = 20.0
+gravity = Vector2(0, -90)
+initial_velocity_min = 30.0
+initial_velocity_max = 60.0
+scale_amount_min = 2.0
+scale_amount_max = 5.0
+color = Color(0.2, 0.9, 0.95, 0.6)
+
+[node name="HazardZone" parent="." instance=ExtResource("2_hazard")]
+position = Vector2(500, 360)
+hazard_type = "ABYSSAL_CURRENT"
+damage = 15
+
+[node name="BuoyantReflector" parent="." instance=ExtResource("3_refl45")]
+position = Vector2(720, 360)
+
+[node name="ReflectorUpperDome" parent="." instance=ExtResource("4_refl")]
+position = Vector2(560, 200)
+rotation = 0.785398
+
+[node name="ReflectorLowerDeep" parent="." instance=ExtResource("4_refl")]
+position = Vector2(880, 500)
+rotation = -0.785398

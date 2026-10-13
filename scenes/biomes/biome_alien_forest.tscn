@@ -1,0 +1,40 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/biomes/biome_alien_forest.gd" id="1_forest"]
+[ext_resource type="PackedScene" path="res://scenes/biomes/biome_hazard_zone.tscn" id="2_hazard"]
+[ext_resource type="PackedScene" path="res://scenes/reflector_45.tscn" id="3_refl45"]
+[ext_resource type="PackedScene" path="res://scenes/reflective_surface.tscn" id="4_refl"]
+
+[node name="BiomeAlienForest" type="Node2D"]
+script = ExtResource("1_forest")
+
+[node name="SporeParticles" type="CPUParticles2D" parent="."]
+position = Vector2(640, 360)
+amount = 55
+lifetime = 6.0
+preprocess = 3.0
+emission_shape = 3
+emission_rect_extents = Vector2(640, 310)
+spread = 180.0
+gravity = Vector2(5, -15)
+initial_velocity_min = 10.0
+initial_velocity_max = 30.0
+scale_amount_min = 2.0
+scale_amount_max = 5.0
+color = Color(0.2, 1, 0.6, 0.7)
+
+[node name="HazardZone" parent="." instance=ExtResource("2_hazard")]
+position = Vector2(920, 360)
+hazard_type = "SPORE_ERUPTION"
+damage = 20
+
+[node name="ReflectorFungalCanopy" parent="." instance=ExtResource("4_refl")]
+position = Vector2(520, 240)
+rotation = 0.523599
+
+[node name="ReflectorFungalFloor" parent="." instance=ExtResource("4_refl")]
+position = Vector2(520, 480)
+rotation = -0.523599
+
+[node name="ReflectorSporeCore" parent="." instance=ExtResource("3_refl45")]
+position = Vector2(740, 360)

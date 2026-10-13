@@ -10,6 +10,7 @@ extends Control
 @onready var continue_btn: Button = $Margin/HBox/NavVBox/ContinueBtn
 @onready var new_game_btn: Button = $Margin/HBox/NavVBox/NewGameBtn
 @onready var campaign_btn: Button = $Margin/HBox/NavVBox/CampaignBtn
+@onready var biomes_btn: Button = $Margin/HBox/NavVBox/BiomesBtn
 @onready var store_btn: Button = $Margin/HBox/NavVBox/StoreBtn
 @onready var credits_btn: Button = $Margin/HBox/NavVBox/CreditsBtn
 @onready var quit_btn: Button = $Margin/HBox/NavVBox/QuitBtn
@@ -17,6 +18,7 @@ extends Control
 @onready var currency_label: Label = $Margin/HBox/DisplayVBox/StatsPanel/VBox/CurrencyLabel
 @onready var cores_label: Label = $Margin/HBox/DisplayVBox/StatsPanel/VBox/CoresLabel
 @onready var act_label: Label = $Margin/HBox/DisplayVBox/StatsPanel/VBox/ActLabel
+@onready var biome_label: Label = $Margin/HBox/DisplayVBox/StatsPanel/VBox/BiomeLabel
 @onready var ship_sprite: Sprite2D = $Margin/HBox/DisplayVBox/ShipPanel/SpriteContainer/ShipSprite
 @onready var dialogue_layer: StoryDialogue = $StoryDialogue
 @onready var credits_modal: PanelContainer = $CreditsModal
@@ -34,6 +36,7 @@ func _ready() -> void:
 	if continue_btn: continue_btn.pressed.connect(_on_continue_pressed)
 	if new_game_btn: new_game_btn.pressed.connect(_on_new_game_pressed)
 	if campaign_btn: campaign_btn.pressed.connect(_on_campaign_pressed)
+	if biomes_btn: biomes_btn.pressed.connect(_on_biomes_pressed)
 	if store_btn: store_btn.pressed.connect(_on_store_pressed)
 	if credits_btn: credits_btn.pressed.connect(_on_credits_pressed)
 	if quit_btn: quit_btn.pressed.connect(_on_quit_pressed)
@@ -65,6 +68,9 @@ func _update_hub_display() -> void:
 		cores_label.text = "RECONSTRUCTION CORES: %d ⬡" % SaveManager.get_reconstruction_cores()
 	if act_label:
 		act_label.text = "ACTIVE CAMPAIGN: ACT %d // OUTPOST 44" % act_num
+	if biome_label:
+		var cur_b = BiomeData.get_biome(SaveManager.get_selected_biome())
+		biome_label.text = "ACTIVE BIOME: %s" % cur_b.get("name", "NEON GRAVEYARD")
 	
 	if ship_sprite:
 		var skin_id = SaveManager.get_equipped_skin()
@@ -100,6 +106,9 @@ func _on_cancel_new_game() -> void:
 
 func _on_campaign_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/campaign_menu.tscn")
+
+func _on_biomes_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/biome_select_menu.tscn")
 
 func _on_store_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/store_menu.tscn")

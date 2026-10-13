@@ -1,0 +1,40 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/biomes/biome_volcanic_world.gd" id="1_volcanic"]
+[ext_resource type="PackedScene" path="res://scenes/biomes/biome_hazard_zone.tscn" id="2_hazard"]
+[ext_resource type="PackedScene" path="res://scenes/reflector_45.tscn" id="3_refl45"]
+[ext_resource type="PackedScene" path="res://scenes/reflective_surface.tscn" id="4_refl"]
+
+[node name="BiomeVolcanicWorld" type="Node2D"]
+script = ExtResource("1_volcanic")
+
+[node name="FireEmberParticles" type="CPUParticles2D" parent="."]
+position = Vector2(640, 660)
+amount = 60
+lifetime = 4.0
+preprocess = 2.0
+emission_shape = 3
+emission_rect_extents = Vector2(640, 20)
+spread = 35.0
+gravity = Vector2(10, -110)
+initial_velocity_min = 40.0
+initial_velocity_max = 90.0
+scale_amount_min = 2.0
+scale_amount_max = 4.5
+color = Color(1, 0.45, 0.1, 0.8)
+
+[node name="HazardZone" parent="." instance=ExtResource("2_hazard")]
+position = Vector2(800, 560)
+hazard_type = "MAGMA_SURGE"
+damage = 25
+
+[node name="ReflectorBasaltChoke1" parent="." instance=ExtResource("4_refl")]
+position = Vector2(500, 280)
+rotation = 0.785398
+
+[node name="ReflectorBasaltChoke2" parent="." instance=ExtResource("4_refl")]
+position = Vector2(500, 480)
+rotation = -0.785398
+
+[node name="ReflectorCaldera" parent="." instance=ExtResource("3_refl45")]
+position = Vector2(720, 260)

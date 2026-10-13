@@ -23,6 +23,8 @@ static func get_default_data() -> Dictionary:
 		"completed_missions": [],
 		"unlocked_skins": ["skin_default"],
 		"equipped_skin": "skin_default",
+		"unlocked_biomes": ["neon_graveyard"],
+		"selected_biome": "neon_graveyard",
 		"unlocked_upgrades": {
 			"upgrade_capacitor": false,
 			"upgrade_nanocell": false,
@@ -249,6 +251,42 @@ static func set_story_flag(flag_name: String, value: bool = true) -> void:
 static func get_story_flag(flag_name: String) -> bool:
 	var flags: Dictionary = get_data().get("story_flags", {})
 	return flags.get(flag_name, false)
+
+# --- Biome Progression & Unlocks ---
+
+static func get_unlocked_biomes() -> Array:
+	return get_data().get("unlocked_biomes", ["neon_graveyard"])
+
+static func is_biome_unlocked(biome_id: String) -> bool:
+	if biome_id == "neon_graveyard":
+		return true
+	var list: Array = get_unlocked_biomes()
+	return biome_id in list
+
+static func unlock_biome(biome_id: String) -> bool:
+	if is_biome_unlocked(biome_id):
+		return true
+	var cost = BiomeData.get_biome_cost(biome_id)
+	if get_currency() < cost:
+		return false
+	if spend_currency(cost):
+		var data = get_data()
+		var list: Array = data.get("unlocked_biomes", ["neon_graveyard"])
+		if biome_id not in list:
+			list.append(biome_id)
+			data["unlocked_biomes"] = list
+			save_data()
+		return true
+	return false
+
+static func get_selected_biome() -> String:
+	return get_data().get("selected_biome", "neon_graveyard")
+
+static func set_selected_biome(biome_id: String) -> void:
+	if is_biome_unlocked(biome_id):
+		var data = get_data()
+		data["selected_biome"] = biome_id
+		save_data()
 
 # --- Safe Migration Helper ---
 

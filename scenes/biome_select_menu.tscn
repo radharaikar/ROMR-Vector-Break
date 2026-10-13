@@ -1,0 +1,212 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/biome_select_menu.gd" id="1_biome_select"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_detail"]
+bg_color = Color(0.035, 0.045, 0.1, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.85, 1, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_desc"]
+bg_color = Color(0.02, 0.025, 0.06, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="BiomeSelectMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_biome_select")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.025, 0.05, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 30
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Header" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="Margin/VBox/Header"]
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "<< HANGAR"
+
+[node name="Title" type="Label" parent="Margin/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "SECTOR BIOME ARCHIVES // THE 5 WORLDS"
+horizontal_alignment = 1
+
+[node name="CurrencyLabel" type="Label" parent="Margin/VBox/Header"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 0.6, 1)
+theme_override_font_sizes/font_size = 14
+text = "VECTOR FRAGMENTS: 0 ◆"
+horizontal_alignment = 2
+
+[node name="Body" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="BiomeScroll" type="ScrollContainer" parent="Margin/VBox/Body"]
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BiomeListVBox" type="VBoxContainer" parent="Margin/VBox/Body/BiomeScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="DetailPanel" type="PanelContainer" parent="Margin/VBox/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_detail")
+
+[node name="VBox" type="VBoxContainer" parent="Margin/VBox/Body/DetailPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DetailTitle" type="Label" parent="Margin/VBox/Body/DetailPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "NEON GRAVEYARD"
+
+[node name="DetailSubtitle" type="Label" parent="Margin/VBox/Body/DetailPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.35, 0.85, 1)
+theme_override_font_sizes/font_size = 14
+text = "Derelict Orbital Relay // Sector 01"
+
+[node name="HSeparator" type="HSeparator" parent="Margin/VBox/Body/DetailPanel/VBox"]
+layout_mode = 2
+
+[node name="DiffRow" type="HBoxContainer" parent="Margin/VBox/Body/DetailPanel/VBox"]
+layout_mode = 2
+
+[node name="DiffHeader" type="Label" parent="Margin/VBox/Body/DetailPanel/VBox/DiffRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+text = "DIFFICULTY:"
+
+[node name="DetailDiff" type="Label" parent="Margin/VBox/Body/DetailPanel/VBox/DiffRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.95, 0.6, 1)
+theme_override_font_sizes/font_size = 13
+text = "RECONNAISSANCE (NORMAL)"
+
+[node name="HazardRow" type="HBoxContainer" parent="Margin/VBox/Body/DetailPanel/VBox"]
+layout_mode = 2
+
+[node name="HazardHeader" type="Label" parent="Margin/VBox/Body/DetailPanel/VBox/HazardRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+text = "HAZARD PROFILE:"
+
+[node name="DetailHazard" type="Label" parent="Margin/VBox/Body/DetailPanel/VBox/HazardRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.4, 0.3, 1)
+theme_override_font_sizes/font_size = 13
+text = "Zero-G Debris Field: Floating station fragments disrupt firing angles."
+autowrap_mode = 3
+
+[node name="CostRow" type="HBoxContainer" parent="Margin/VBox/Body/DetailPanel/VBox"]
+layout_mode = 2
+
+[node name="CostHeader" type="Label" parent="Margin/VBox/Body/DetailPanel/VBox/CostRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+text = "UNLOCK COST:"
+
+[node name="DetailCost" type="Label" parent="Margin/VBox/Body/DetailPanel/VBox/CostRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 13
+text = "FREE"
+
+[node name="DetailDescPanel" type="PanelContainer" parent="Margin/VBox/Body/DetailPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_desc")
+
+[node name="Margin" type="MarginContainer" parent="Margin/VBox/Body/DetailPanel/VBox/DetailDescPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="DetailDesc" type="Label" parent="Margin/VBox/Body/DetailPanel/VBox/DetailDescPanel/Margin"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+text = "Dark navy space expanse drifting with station wreckage, dead satellites, and fractured solar arrays."
+autowrap_mode = 3
+
+[node name="StatusMsg" type="Label" parent="Margin/VBox/Body/DetailPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 0.6, 1)
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+
+[node name="DeployButton" type="Button" parent="Margin/VBox/Body/DetailPanel/VBox"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "SELECT & DEPLOY TO WORLD >>"
+
+[node name="UnlockButton" type="Button" parent="Margin/VBox/Body/DetailPanel/VBox"]
+visible = false
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 15
+text = "UNLOCK BIOME [100 VECTOR FRAGMENTS ◆]"

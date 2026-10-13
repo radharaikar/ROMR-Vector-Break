@@ -118,6 +118,13 @@ theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
 theme_override_font_sizes/font_size = 15
 text = "CAMPAIGN OPERATIONS (5 ACTS)"
 
+[node name="BiomesBtn" type="Button" parent="Margin/HBox/NavVBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 0.6, 1)
+theme_override_font_sizes/font_size = 15
+text = "PLANETARY WORLDS (5 BIOMES)"
+
 [node name="StoreBtn" type="Button" parent="Margin/HBox/NavVBox"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
@@ -183,6 +190,12 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
 theme_override_font_sizes/font_size = 14
 text = "RECONSTRUCTION CORES: 1 ⬡"
+
+[node name="BiomeLabel" type="Label" parent="Margin/HBox/DisplayVBox/StatsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 0.6, 1)
+theme_override_font_sizes/font_size = 14
+text = "ACTIVE BIOME: NEON GRAVEYARD"
 
 [node name="StoryDialogue" parent="." instance=ExtResource("3_dialogue")]
 
