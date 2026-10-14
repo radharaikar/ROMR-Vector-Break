@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/hud.gd" id="1_hud"]
 
@@ -34,7 +34,75 @@ expand_margin_top = 3.0
 expand_margin_right = 8.0
 expand_margin_bottom = 3.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_banner"]
+bg_color = Color(0.02, 0.04, 0.1, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.8, 1, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_health_bg"]
+bg_color = Color(0.08, 0.1, 0.16, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_health_fill"]
+bg_color = Color(0.15, 0.9, 0.7, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 1, 0.9, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boss_fill"]
+bg_color = Color(1, 0.2, 0.45, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.6, 0.8, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
+bg_color = Color(0.03, 0.04, 0.1, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.2, 0.35, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pause"]
+bg_color = Color(0.02, 0.03, 0.09, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.9, 1, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [node name="HUD" type="CanvasLayer"]
+process_mode = 3
 script = ExtResource("1_hud")
 
 [node name="Control" type="Control" parent="."]
@@ -51,27 +119,37 @@ layout_mode = 1
 anchors_preset = 0
 offset_left = 24.0
 offset_top = 18.0
-offset_right = 320.0
-offset_bottom = 58.0
+offset_right = 450.0
+offset_bottom = 80.0
 
-[node name="TitleLabel" type="Label" parent="Control/TitleMargin"]
+[node name="VBox" type="VBoxContainer" parent="Control/TitleMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="Control/TitleMargin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
 theme_override_colors/font_shadow_color = Color(0.9, 0.1, 0.7, 0.8)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 20
-text = "VECTOR//BREAK  [ALPHA]"
+text = "VECTOR//BREAK — THE LAST TRAJECTORY"
+
+[node name="StatusLabel" type="Label" parent="Control/TitleMargin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 1, 0.9)
+theme_override_font_sizes/font_size = 14
+text = "WAVE 1 / 2 | TIME: 01:00 | HOSTILES: 2"
 
 [node name="MarginContainer" type="MarginContainer" parent="Control"]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -260.0
+offset_left = -280.0
 offset_top = 20.0
-offset_right = -30.0
-offset_bottom = 110.0
+offset_right = -24.0
+offset_bottom = 160.0
 grow_horizontal = 0
 
 [node name="HUDPanel" type="PanelContainer" parent="Control/MarginContainer"]
@@ -80,7 +158,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_hud")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
 [node name="ScoreLabel" type="Label" parent="Control/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -100,3 +178,336 @@ theme_override_colors/font_color = Color(1, 0.35, 0.9, 1)
 theme_override_font_sizes/font_size = 14
 text = "COMBO  x1"
 horizontal_alignment = 1
+
+[node name="CurrencyLabel" type="Label" parent="Control/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "FRAGMENTS  0000 ◆"
+horizontal_alignment = 2
+
+[node name="CoresLabel" type="Label" parent="Control/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
+theme_override_font_sizes/font_size = 13
+text = "CORES  1 ⬡"
+horizontal_alignment = 2
+
+[node name="HealthMargin" type="MarginContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -90.0
+offset_right = 320.0
+offset_bottom = -20.0
+grow_vertical = 0
+
+[node name="HealthPanel" type="PanelContainer" parent="Control/HealthMargin"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/HealthMargin/HealthPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HealthHeader" type="HBoxContainer" parent="Control/HealthMargin/HealthPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="HealthLabel" type="Label" parent="Control/HealthMargin/HealthPanel/VBoxContainer/HealthHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.25, 0.95, 0.85, 1)
+theme_override_font_sizes/font_size = 14
+text = "HULL INTEGRITY  100 / 100"
+
+[node name="HealthProgressBar" type="ProgressBar" parent="Control/HealthMargin/HealthPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_health_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_health_fill")
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="CriticalWarning" type="Label" parent="Control/HealthMargin/HealthPanel/VBoxContainer"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.25, 0.35, 1)
+theme_override_font_sizes/font_size = 12
+text = "[ ! CRITICAL DAMAGE ! ]"
+horizontal_alignment = 1
+
+[node name="BossHealthMargin" type="MarginContainer" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -240.0
+offset_top = 16.0
+offset_right = 240.0
+offset_bottom = 74.0
+grow_horizontal = 2
+
+[node name="BossPanel" type="PanelContainer" parent="Control/BossHealthMargin"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud")
+
+[node name="VBox" type="VBoxContainer" parent="Control/BossHealthMargin/BossPanel"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="BossTitleLabel" type="Label" parent="Control/BossHealthMargin/BossPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.5, 1)
+theme_override_font_sizes/font_size = 14
+text = "FLAGSHIP: COMMANDER SERIN // THE GATEKEEPER"
+horizontal_alignment = 1
+
+[node name="BossProgressBar" type="ProgressBar" parent="Control/BossHealthMargin/BossPanel/VBox"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_health_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_boss_fill")
+max_value = 500.0
+value = 500.0
+show_percentage = false
+
+[node name="CenterBanner" type="PanelContainer" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -180.0
+offset_right = 280.0
+offset_bottom = -120.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_banner")
+
+[node name="BannerLabel" type="Label" parent="Control/CenterBanner"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "TACTICAL ENGAGEMENT COMMENCING"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DefeatOverlay" type="Control" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="Control/DefeatOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.02, 0.06, 0.85)
+
+[node name="CenterContainer" type="CenterContainer" parent="Control/DefeatOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DefeatPanel" type="PanelContainer" parent="Control/DefeatOverlay/CenterContainer"]
+custom_minimum_size = Vector2(460, 260)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
+
+[node name="VBox" type="VBoxContainer" parent="Control/DefeatOverlay/CenterContainer/DefeatPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="HeaderMargin" type="MarginContainer" parent="Control/DefeatOverlay/CenterContainer/DefeatPanel/VBox"]
+layout_mode = 2
+theme_override_constants/margin_top = 16
+
+[node name="DefeatTitle" type="Label" parent="Control/DefeatOverlay/CenterContainer/DefeatPanel/VBox/HeaderMargin"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.25, 0.4, 1)
+theme_override_colors/font_shadow_color = Color(0.5, 0.05, 0.1, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 22
+text = "TRAJECTORY FAILED // HULL BREACH"
+horizontal_alignment = 1
+
+[node name="DefeatSub" type="Label" parent="Control/DefeatOverlay/CenterContainer/DefeatPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "Kinetic impact exceeded structural tolerance."
+horizontal_alignment = 1
+
+[node name="ButtonContainer" type="VBoxContainer" parent="Control/DefeatOverlay/CenterContainer/DefeatPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_constants/separation = 10
+
+[node name="ReviveButton" type="Button" parent="Control/DefeatOverlay/CenterContainer/DefeatPanel/VBox/ButtonContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "[ SECOND CHANCE: USE CORE ]"
+
+[node name="RetryButton" type="Button" parent="Control/DefeatOverlay/CenterContainer/DefeatPanel/VBox/ButtonContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ RETRY SECTOR ]"
+
+[node name="HangarButton" type="Button" parent="Control/DefeatOverlay/CenterContainer/DefeatPanel/VBox/ButtonContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ RETURN TO HANGAR ]"
+
+[node name="PauseOverlay" type="Control" parent="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="Control/PauseOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.025, 0.07, 0.88)
+
+[node name="Center" type="CenterContainer" parent="Control/PauseOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PausePanel" type="PanelContainer" parent="Control/PauseOverlay/Center"]
+custom_minimum_size = Vector2(440, 320)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pause")
+
+[node name="Margin" type="MarginContainer" parent="Control/PauseOverlay/Center/PausePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="Control/PauseOverlay/Center/PausePanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PauseTitle" type="Label" parent="Control/PauseOverlay/Center/PausePanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "TACTICAL SIMULATION PAUSED"
+horizontal_alignment = 1
+
+[node name="PauseSub" type="Label" parent="Control/PauseOverlay/Center/PausePanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.95, 1)
+theme_override_font_sizes/font_size = 13
+text = "Press [ESCAPE] to return to combat."
+horizontal_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="Control/PauseOverlay/Center/PausePanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 15
+text = "[ RESUME MISSION ]"
+
+[node name="RestartButton" type="Button" parent="Control/PauseOverlay/Center/PausePanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ RESTART SECTOR ]"
+
+[node name="ControlsButton" type="Button" parent="Control/PauseOverlay/Center/PausePanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ CONTROLS & MANUAL ]"
+
+[node name="HangarAbortButton" type="Button" parent="Control/PauseOverlay/Center/PausePanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.35, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ ABORT TO HANGAR ]"
+
+[node name="ControlsModal" type="PanelContainer" parent="Control/PauseOverlay"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -180.0
+offset_right = 260.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud")
+
+[node name="Margin" type="MarginContainer" parent="Control/PauseOverlay/ControlsModal"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="Control/PauseOverlay/ControlsModal/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Control/PauseOverlay/ControlsModal/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "FLIGHT MANUAL & CONTROLS"
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="Control/PauseOverlay/ControlsModal/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 13
+text = "• MOVE: [W, A, S, D] or [Arrow Keys]
+• AIM: Mouse Reticle (Cyan Preview Line)
+• FIRE: [Left Click] or [Spacebar]
+• RICOCHET: Direct shots hit reflectors at 45° / 135° and bounce 90°.
+• SHIELD BYPASS: Heavy Drones deflect frontal fire. Bounce shots behind them to destroy!
+• PAUSE: [Escape]"
+autowrap_mode = 3
+
+[node name="CloseControlsBtn" type="Button" parent="Control/PauseOverlay/ControlsModal/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.9, 1, 1)
+text = "[ CLOSE MANUAL ]"

@@ -1,0 +1,201 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/prologue.gd" id="1_prologue"]
+[ext_resource type="Script" path="res://scripts/space_environment.gd" id="2_env"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://scenes/custom_cursor.tscn" id="4_cursor"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_top"]
+normal = Vector2(0, 1)
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_bottom"]
+normal = Vector2(0, -1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.03, 0.04, 0.1, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.85, 1, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_trans"]
+bg_color = Color(0.02, 0.03, 0.08, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.25, 0.7, 0.85)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="Prologue" type="Node2D"]
+script = ExtResource("1_prologue")
+
+[node name="SpaceEnvironment" type="Node2D" parent="."]
+script = ExtResource("2_env")
+
+[node name="ArenaBorders" type="StaticBody2D" parent="."]
+collision_layer = 4
+collision_mask = 3
+
+[node name="TopCollision" type="CollisionShape2D" parent="ArenaBorders"]
+position = Vector2(640, 48)
+shape = SubResource("WorldBoundaryShape2D_top")
+
+[node name="BottomCollision" type="CollisionShape2D" parent="ArenaBorders"]
+position = Vector2(640, 672)
+shape = SubResource("WorldBoundaryShape2D_bottom")
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector2(160, 360)
+
+[node name="TutorialCanvas" type="CanvasLayer" parent="."]
+
+[node name="ObjectivePanel" type="PanelContainer" parent="TutorialCanvas"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 20.0
+offset_right = 300.0
+offset_bottom = 90.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="TutorialCanvas/ObjectivePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="TutorialCanvas/ObjectivePanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ObjectiveLabel" type="Label" parent="TutorialCanvas/ObjectivePanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "OBJECTIVE: INITIALIZING..."
+horizontal_alignment = 1
+
+[node name="SubLabel" type="Label" parent="TutorialCanvas/ObjectivePanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.95, 1)
+theme_override_font_sizes/font_size = 13
+text = "Awaiting flight telemetry."
+horizontal_alignment = 1
+
+[node name="TransmissionPanel" type="PanelContainer" parent="TutorialCanvas"]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -380.0
+offset_top = -140.0
+offset_right = 380.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_trans")
+
+[node name="Margin" type="MarginContainer" parent="TutorialCanvas/TransmissionPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="TutorialCanvas/TransmissionPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SpeakerLabel" type="Label" parent="TutorialCanvas/TransmissionPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
+theme_override_font_sizes/font_size = 14
+text = "TRANSMISSION SOURCE"
+
+[node name="MessageLabel" type="Label" parent="TutorialCanvas/TransmissionPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "Message text goes here."
+autowrap_mode = 3
+
+[node name="CutsceneCanvas" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="FlashRect" type="ColorRect" parent="CutsceneCanvas"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 1)
+
+[node name="Overlay" type="Control" parent="CutsceneCanvas"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="ColorRect" parent="CutsceneCanvas/Overlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.015, 0.02, 0.05, 0.98)
+
+[node name="Center" type="CenterContainer" parent="CutsceneCanvas/Overlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="CutsceneCanvas/Overlay/Center"]
+custom_minimum_size = Vector2(720, 0)
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="CutsceneText" type="Label" parent="CutsceneCanvas/Overlay/Center/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "CUTSCENE"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ProceedButton" type="Button" parent="CutsceneCanvas/Overlay/Center/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "[ ENTER ACT I: GHOSTS IN THE SIGNAL >> ]"
+
+[node name="HangarButton" type="Button" parent="CutsceneCanvas/Overlay/Center/VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ RETURN TO HANGAR ]"
+
+[node name="CustomCursor" parent="." instance=ExtResource("4_cursor")]

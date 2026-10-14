@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemy_heavy.gd" id="1_heavy"]
+[ext_resource type="Texture2D" path="res://assets/sprites/geometric_drone.png" id="2_tex"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_explosion.tscn" id="3_exp"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_heavy"]
+radius = 26.0
+
+[node name="EnemyHeavy" type="CharacterBody2D" groups=["enemies"]]
+collision_layer = 4
+collision_mask = 3
+motion_mode = 1
+script = ExtResource("1_heavy")
+max_health = 150
+score_value = 350
+base_speed = 38.0
+explosion_scene = ExtResource("3_exp")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(1.3, 1.3)
+texture = ExtResource("2_tex")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_heavy")

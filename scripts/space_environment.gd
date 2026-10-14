@@ -34,13 +34,46 @@ func _generate_structures() -> void:
 	station_girders.append(Rect2(1100, 48, 32, 624))
 
 func _draw() -> void:
+	var biome_id = SaveManager.get_selected_biome() if SaveManager else "neon_graveyard"
+	var bg_col_top = Color(0.02, 0.03, 0.07)
+	var bg_col_mid = Color(0.04, 0.07, 0.16)
+	var moon_col = Color(0.07, 0.11, 0.22, 0.8)
+	var conduit_a = Color(0.1, 0.85, 1.0, 0.75)
+	var conduit_b = Color(1.0, 0.18, 0.8, 0.75)
+	
+	match biome_id:
+		"vesper_desert":
+			bg_col_top = Color(0.06, 0.04, 0.02)
+			bg_col_mid = Color(0.14, 0.09, 0.04)
+			moon_col = Color(0.22, 0.15, 0.08, 0.85)
+			conduit_a = Color(1.0, 0.75, 0.2, 0.85)
+			conduit_b = Color(1.0, 0.4, 0.1, 0.75)
+		"pelagic_depths":
+			bg_col_top = Color(0.01, 0.03, 0.08)
+			bg_col_mid = Color(0.02, 0.08, 0.18)
+			moon_col = Color(0.04, 0.14, 0.26, 0.85)
+			conduit_a = Color(0.2, 0.7, 1.0, 0.85)
+			conduit_b = Color(0.0, 0.9, 0.8, 0.75)
+		"pyroclastic_rift":
+			bg_col_top = Color(0.08, 0.02, 0.02)
+			bg_col_mid = Color(0.18, 0.04, 0.04)
+			moon_col = Color(0.28, 0.08, 0.05, 0.85)
+			conduit_a = Color(1.0, 0.3, 0.1, 0.85)
+			conduit_b = Color(1.0, 0.7, 0.1, 0.75)
+		"viridian_canopy":
+			bg_col_top = Color(0.02, 0.06, 0.03)
+			bg_col_mid = Color(0.04, 0.14, 0.07)
+			moon_col = Color(0.06, 0.22, 0.11, 0.85)
+			conduit_a = Color(0.2, 0.95, 0.5, 0.85)
+			conduit_b = Color(0.1, 0.8, 0.7, 0.75)
+
 	# 1. Deep Space Gradient
 	var bg_rect = Rect2(0, 0, 1280, 720)
 	var colors = PackedColorArray([
-		Color(0.02, 0.03, 0.07), # Deep space black/navy
-		Color(0.04, 0.07, 0.16),
-		Color(0.06, 0.08, 0.19),
-		Color(0.02, 0.03, 0.08)
+		bg_col_top,
+		bg_col_mid,
+		bg_col_mid,
+		bg_col_top
 	])
 	var points = PackedVector2Array([
 		Vector2(0, 0),
@@ -50,16 +83,16 @@ func _draw() -> void:
 	])
 	draw_polygon(points, colors)
 	
-	# 2. Celestial Body (Distant moon/planet with blue-white crescent rim)
+	# 2. Celestial Body (Distant moon/planet with crescent rim)
 	var moon_center = Vector2(490, 160)
 	var moon_radius = 110.0
-	draw_circle(moon_center, moon_radius, Color(0.07, 0.11, 0.22, 0.8))
+	draw_circle(moon_center, moon_radius, moon_col)
 	# Subtle crater accents
-	draw_circle(moon_center + Vector2(-30, -20), 18.0, Color(0.05, 0.08, 0.17, 0.6))
-	draw_circle(moon_center + Vector2(20, 35), 24.0, Color(0.05, 0.08, 0.17, 0.5))
-	draw_circle(moon_center + Vector2(-10, 50), 14.0, Color(0.05, 0.08, 0.17, 0.5))
+	draw_circle(moon_center + Vector2(-30, -20), 18.0, Color(0.03, 0.05, 0.1, 0.6))
+	draw_circle(moon_center + Vector2(20, 35), 24.0, Color(0.03, 0.05, 0.1, 0.5))
+	draw_circle(moon_center + Vector2(-10, 50), 14.0, Color(0.03, 0.05, 0.1, 0.5))
 	# Crescent atmosphere rim
-	draw_arc(moon_center, moon_radius, -PI * 0.8, PI * 0.15, 64, Color(0.3, 0.7, 1.0, 0.45), 3.0)
+	draw_arc(moon_center, moon_radius, -PI * 0.8, PI * 0.15, 64, conduit_a, 3.0)
 	
 	# 3. Distant Stars
 	for star in stars:
@@ -78,13 +111,11 @@ func _draw() -> void:
 					1.5
 				)
 	
-	# 5. Neon Conduits (Magenta and Cyan energy cables)
-	# Upper cyan conduit
-	draw_line(Vector2(0, 48), Vector2(1280, 48), Color(0.1, 0.85, 1.0, 0.75), 2.0)
-	# Lower magenta conduit
-	draw_line(Vector2(0, 672), Vector2(1280, 672), Color(1.0, 0.18, 0.8, 0.75), 2.0)
+	# 5. Neon Conduits (Biome-themed energy cables)
+	draw_line(Vector2(0, 48), Vector2(1280, 48), conduit_a, 2.0)
+	draw_line(Vector2(0, 672), Vector2(1280, 672), conduit_b, 2.0)
 	
 	# Decorative sci-fi chevron markings on borders
 	for x in range(120, 1200, 180):
-		draw_line(Vector2(x, 44), Vector2(x + 16, 44), Color(0.3, 0.9, 1.0, 0.9), 3.0)
-		draw_line(Vector2(x, 676), Vector2(x + 16, 676), Color(1.0, 0.3, 0.85, 0.9), 3.0)
+		draw_line(Vector2(x, 44), Vector2(x + 16, 44), conduit_a, 3.0)
+		draw_line(Vector2(x, 676), Vector2(x + 16, 676), conduit_b, 3.0)

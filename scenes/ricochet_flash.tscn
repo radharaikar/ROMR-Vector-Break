@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ricochet_flash.gd" id="1_flash_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ricochet_flash.png" id="2_flash_tex"]
+
+[node name="RicochetFlash" type="Sprite2D"]
+texture_filter = 1
+texture = ExtResource("2_flash_tex")
+script = ExtResource("1_flash_script")
