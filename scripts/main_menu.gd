@@ -32,24 +32,27 @@ const SettingsManager = preload("res://scripts/settings_manager.gd")
 
 var _time_elapsed: float = 0.0
 var _stars: Array[Dictionary] = []
+var _last_focused_button: Control = null
 
 func _ready() -> void:
 	SettingsManager.load_settings()
 	SaveManager.load_data()
 	
-	# Generate background starfield
+	# Generate background starfield with multi-depth particles
 	var rng = RandomNumberGenerator.new()
 	rng.seed = 1337
-	for i in range(90):
+	for i in range(120):
 		_stars.append({
 			"pos": Vector2(rng.randf_range(0, 1280), rng.randf_range(0, 720)),
-			"size": rng.randf_range(0.8, 2.4),
-			"alpha": rng.randf_range(0.3, 0.9)
+			"size": rng.randf_range(0.8, 2.6),
+			"alpha": rng.randf_range(0.3, 0.95),
+			"speed": rng.randf_range(8.0, 22.0)
 		})
 	
 	_update_header_stats()
 	_update_ship_skin()
 	_connect_main_buttons()
+	_setup_keyboard_navigation()
 	_setup_settings_controls()
 	
 	var close_biome: Button = $BiomeModal/Margin/VBox/HeaderHBox/CloseBiomeBtn
@@ -67,8 +70,42 @@ func _ready() -> void:
 				_hide_all_modals()
 		)
 	
-	# Hide all modals by default
+	# Hide all modals by default and grab focus
 	_hide_all_modals()
+	_last_focused_button = play_btn
+	if play_btn:
+		play_btn.grab_focus()
+
+func _setup_keyboard_navigation() -> void:
+	var nav_buttons = [play_btn, collections_btn, store_btn, level_btn, settings_btn, quit_btn]
+	for i in range(nav_buttons.size()):
+		var btn = nav_buttons[i]
+		if not btn: continue
+		var prev_btn = nav_buttons[(i - 1 + nav_buttons.size()) % nav_buttons.size()]
+		var next_btn = nav_buttons[(i + 1) % nav_buttons.size()]
+		btn.focus_neighbor_top = prev_btn.get_path()
+		btn.focus_neighbor_bottom = next_btn.get_path()
+		
+		# Glowing neon cyan stylebox for focus state
+		var focus_sb = StyleBoxFlat.new()
+		focus_sb.bg_color = Color(0.05, 0.10, 0.20, 0.95)
+		focus_sb.border_width_left = 2
+		focus_sb.border_width_top = 2
+		focus_sb.border_width_right = 2
+		focus_sb.border_width_bottom = 2
+		focus_sb.border_color = Color(0.2, 0.95, 1.0, 1.0)
+		focus_sb.corner_radius_top_left = 6
+		focus_sb.corner_radius_top_right = 6
+		focus_sb.corner_radius_bottom_right = 6
+		focus_sb.corner_radius_bottom_left = 6
+		btn.add_theme_stylebox_override("focus", focus_sb)
+		
+		# Glowing emerald hover stylebox
+		var hover_sb = focus_sb.duplicate()
+		hover_sb.border_color = Color(0.3, 1.0, 0.75, 0.95)
+		btn.add_theme_stylebox_override("hover", hover_sb)
+		
+		btn.focus_entered.connect(func(): _last_focused_button = btn)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -93,21 +130,69 @@ func _process(delta: float) -> void:
 		ship_preview.rotation = sin(_time_elapsed * 1.5) * 0.04
 
 func _draw() -> void:
-	# Subtle drifting starfield
+	# 1. Volumetric nebula clouds in deep background
+	draw_circle(Vector2(240 + sin(_time_elapsed * 0.2) * 35.0, 180), 220.0, Color(0.03, 0.12, 0.24, 0.18))
+	draw_circle(Vector2(1020 + cos(_time_elapsed * 0.15) * 40.0, 480), 260.0, Color(0.18, 0.04, 0.24, 0.14))
+	draw_circle(Vector2(640, 680), 280.0, Color(0.04, 0.08, 0.18, 0.22))
+	
+	# 2. Celestial body: Textured moon / gas giant with atmospheric corona
+	var moon_pos = Vector2(1040, 220)
+	var moon_r = 95.0
+	
+	# Corona / atmospheric glow rings
+	draw_circle(moon_pos, moon_r + 26.0, Color(0.1, 0.5, 0.85, 0.05))
+	draw_circle(moon_pos, moon_r + 14.0, Color(0.15, 0.7, 1.0, 0.09))
+	draw_circle(moon_pos, moon_r + 4.0, Color(0.2, 0.9, 1.0, 0.15))
+	
+	# Celestial sphere base
+	draw_circle(moon_pos, moon_r, Color(0.02, 0.035, 0.075, 1.0))
+	
+	# Detailed textured craters
+	var craters = [
+		{"offset": Vector2(-28, -20), "r": 18.0},
+		{"offset": Vector2(22, -36), "r": 14.0},
+		{"offset": Vector2(-12, 34), "r": 22.0},
+		{"offset": Vector2(36, 16), "r": 16.0},
+		{"offset": Vector2(-46, 8), "r": 12.0}
+	]
+	for c in craters:
+		var c_center = moon_pos + c["offset"]
+		draw_circle(c_center, c["r"], Color(0.012, 0.02, 0.045, 0.95))
+		draw_arc(c_center, c["r"], 0.2, 3.0, 16, Color(0.15, 0.6, 0.85, 0.35), 1.2)
+	
+	# Crescent illumination terminator arc
+	draw_arc(moon_pos, moon_r - 2.0, -1.2, 1.2, 32, Color(0.3, 0.95, 1.0, 0.85), 2.5)
+	draw_arc(moon_pos, moon_r - 5.0, -1.0, 1.0, 24, Color(0.5, 0.85, 1.0, 0.4), 1.5)
+	
+	# Orbital ring passing around the moon
+	for ring_pt in range(40):
+		var ang = -0.3 + float(ring_pt) / 39.0 * 3.6
+		var rx = moon_pos.x + cos(ang) * 160.0
+		var ry = moon_pos.y + sin(ang) * 42.0
+		draw_circle(Vector2(rx, ry), 1.2, Color(0.3, 0.85, 1.0, 0.45))
+	
+	# 3. Subtle drifting starfield at varying depths
 	for star in _stars:
 		var pos = star["pos"]
-		pos.x = fmod(pos.x - _time_elapsed * 15.0, 1280.0)
+		var spd = star.get("speed", 15.0)
+		pos.x = fmod(pos.x - _time_elapsed * spd, 1280.0)
 		if pos.x < 0: pos.x += 1280.0
-		var a = star["alpha"] * (0.7 + sin(_time_elapsed * 3.0 + star["pos"].y) * 0.3)
-		draw_circle(pos, star["size"], Color(0.8, 0.9, 1.0, a))
+		var a = star["alpha"] * (0.65 + sin(_time_elapsed * 3.2 + star["pos"].y) * 0.35)
+		draw_circle(pos, star["size"], Color(0.85, 0.92, 1.0, a))
 		
-	# Subtle thruster particle tail behind ship
+	# 4. Animated spaceship thruster plumes responding to ship hover oscillations
 	if ship_preview:
 		var tail_origin = ship_preview.global_position + Vector2(-36, 0)
-		for i in range(5):
-			var t_pos = tail_origin - Vector2(i * 12.0 + sin(_time_elapsed * 10.0 + i) * 4.0, (i % 2) * 2.0)
-			var col = Color(0.2, 0.9, 1.0, 0.7 - i * 0.12) if (i % 2 == 0) else Color(1.0, 0.2, 0.7, 0.7 - i * 0.12)
-			draw_circle(t_pos, 4.0 - i * 0.6, col)
+		var thruster_pulse = 1.0 + abs(cos(_time_elapsed * 2.2)) * 0.6
+		
+		# Core bright plasma flame
+		for i in range(8):
+			var dist = i * 9.0 * thruster_pulse
+			var jitter = sin(_time_elapsed * 18.0 + i) * 2.5
+			var t_pos = tail_origin - Vector2(dist, jitter)
+			var col = Color(0.3, 0.95, 1.0, 0.85 - i * 0.1) if (i < 4) else Color(1.0, 0.25, 0.75, 0.7 - i * 0.08)
+			var sz = maxf(1.0, (5.5 - i * 0.6) * thruster_pulse)
+			draw_circle(t_pos, sz, col)
 
 func _update_header_stats() -> void:
 	if currency_display:
@@ -141,6 +226,8 @@ func _hide_all_modals() -> void:
 	if collections_modal: collections_modal.visible = false
 	if level_modal: level_modal.visible = false
 	if settings_modal: settings_modal.visible = false
+	if _last_focused_button and is_instance_valid(_last_focused_button):
+		_last_focused_button.grab_focus()
 
 func _show_modal(modal: Control) -> void:
 	_hide_all_modals()
@@ -224,6 +311,9 @@ func _populate_biome_list() -> void:
 			action_btn.disabled = is_selected
 			action_btn.pressed.connect(func():
 				SaveManager.select_biome(id)
+				var act_num = CampaignData.get_act_for_biome(id)
+				SaveManager.get_data()["selected_act"] = act_num
+				SaveManager.save_data()
 				_hide_all_modals()
 				get_tree().change_scene_to_file("res://scenes/act1_mission.tscn")
 			)

@@ -127,5 +127,111 @@ static func get_dialogue(dialogue_id: String) -> Array:
 				}
 			]
 		
+		"act2_briefing":
+			return [
+				{
+					"speaker": "MIRA VEYR [DATA TAP]",
+					"color": Color(0.2, 0.9, 1.0),
+					"text": "Kael, you've breached the Ashen Colonies. The atmosphere is choked with Vesper-9 fallout. Lucien Vale has deployed the Huntsman to intercept you."
+				},
+				{
+					"speaker": "KAEL VEYR",
+					"color": Color(0.3, 0.8, 1.0),
+					"text": "I see their searchlights. Fast Dashers and heavy barricades ahead. I'm cutting through."
+				}
+			]
+		
+		"act2_victory":
+			return [
+				{
+					"speaker": "TACTICAL DEBRIEF // SECTOR CLEAR",
+					"color": Color(0.2, 0.95, 0.6),
+					"text": "ACT II CLEARED: ASHEN COLONIES SECURED.\nThe Huntsman has been neutralized. Telemetry conduit acquired."
+				},
+				{
+					"speaker": "KAEL VEYR",
+					"color": Color(0.3, 0.8, 1.0),
+					"text": "I've recovered the laboratory coordinates. Mira, I'm heading into the deep research trench."
+				}
+			]
+		
+		"act3_briefing":
+			return [
+				{
+					"speaker": "LUCIEN VALE [AXIOM HIGH COMMAND]",
+					"color": Color(1.0, 0.25, 0.25),
+					"text": "Subject Kael Veyr. You dismantled my patrol and my hunter. But you cannot bypass the Living Circuit. The Warden awaits."
+				},
+				{
+					"speaker": "KAEL VEYR",
+					"color": Color(0.3, 0.8, 1.0),
+					"text": "Your constructs don't frighten me, Vale. Where is my sister?"
+				},
+				{
+					"speaker": "MIRA VEYR",
+					"color": Color(0.2, 0.9, 1.0),
+					"text": "Kael... I can feel the Engine pulsing. It's draining the colony capacitors. Watch the angled reflectors!"
+				}
+			]
+		
+		"act3_victory":
+			return [
+				{
+					"speaker": "TACTICAL DEBRIEF // SECTOR CLEAR",
+					"color": Color(0.2, 0.95, 0.6),
+					"text": "ACT III CLEARED: AXIOM RESEARCH BREACHED.\nThe Warden construct is offline. Citadel transit unlocked."
+				},
+				{
+					"speaker": "KAEL VEYR",
+					"color": Color(0.3, 0.8, 1.0),
+					"text": "The bio-laboratories are quiet. Mira, the path to the Citadel is open."
+				}
+			]
+		
+		"act4_briefing":
+			return [
+				{
+					"speaker": "COMMANDER SERIN // CITADEL DEFENSE",
+					"color": Color(1.0, 0.35, 0.4),
+					"text": "This is the final line, Kael. The Citadel fleet is scrambled. If you cross this threshold, there is no return."
+				},
+				{
+					"speaker": "KAEL VEYR",
+					"color": Color(0.3, 0.8, 1.0),
+					"text": "You surrendered your conscience to AXIOM three years ago, Serin. I'm breaking the fleet."
+				}
+			]
+		
+		"act4_victory":
+			return [
+				{
+					"speaker": "TACTICAL DEBRIEF // SECTOR CLEAR",
+					"color": Color(0.2, 0.95, 0.6),
+					"text": "ACT IV CLEARED: CITADEL DEFENSES NEUTRALIZED.\nFleet flagship crippled. Heart of the Engine accessible."
+				},
+				{
+					"speaker": "KAEL VEYR",
+					"color": Color(0.3, 0.8, 1.0),
+					"text": "Serin is down. The Citadel core has collapsed. I'm entering the Vector chamber."
+				}
+			]
+		
+		"act5_briefing":
+			return [
+				{
+					"speaker": "ORACLE TACTICAL AI",
+					"color": Color(1.0, 0.25, 0.4),
+					"text": "SUBJECT KAEL VEYR. YOU HAVE REACHED THE FOCAL CORE. PROBABILITY OF RESCUING SUBJECT MIRA VEYR: 0.0000%."
+				},
+				{
+					"speaker": "KAEL VEYR",
+					"color": Color(0.3, 0.8, 1.0),
+					"text": "Keep calculating, ORACLE. I'm terminating the program."
+				}
+			]
+		
 		_:
 			return []
+
+static func has_sequence(dialogue_id: String) -> bool:
+	return get_dialogue(dialogue_id).size() > 0

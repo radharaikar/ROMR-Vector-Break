@@ -128,6 +128,8 @@ func _connect_player() -> void:
 	if player:
 		if player.has_signal("health_changed") and not player.health_changed.is_connected(_on_health_changed):
 			player.health_changed.connect(_on_health_changed)
+		if player.has_signal("player_healed") and not player.player_healed.is_connected(_on_player_healed):
+			player.player_healed.connect(_on_player_healed)
 		if player.has_signal("player_died") and not player.player_died.is_connected(_on_player_died):
 			player.player_died.connect(_on_player_died)
 		if "current_health" in player and "max_health" in player:
@@ -187,6 +189,17 @@ func _on_health_changed(current: int, maximum: int) -> void:
 	var health_ratio: float = float(current) / float(maximum) if maximum > 0 else 0.0
 	if critical_warning:
 		critical_warning.visible = (health_ratio <= 0.25 and current > 0)
+
+func _on_player_healed(amount: int) -> void:
+	if health_bar:
+		var tween = create_tween()
+		health_bar.modulate = Color(0.2, 2.5, 0.8, 1.0)
+		tween.tween_property(health_bar, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.35)
+	if health_label:
+		var tween = create_tween()
+		health_label.modulate = Color(0.3, 1.8, 0.8, 1.0)
+		tween.tween_property(health_label, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.35)
+	show_banner("+%d HP REPAIRED" % amount, Color(0.2, 1.0, 0.5))
 
 func show_boss_health(boss_name: String, max_hp: int) -> void:
 	if boss_health_margin:

@@ -1,0 +1,118 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/campaign_ending.gd" id="1_ending"]
+[ext_resource type="PackedScene" path="res://scenes/story_dialogue.tscn" id="2_dialogue"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.02, 0.03, 0.08, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.04, 0.06, 0.14, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.95, 1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="CampaignEnding" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ending")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="StoryDialogue" parent="." instance=ExtResource("2_dialogue")]
+
+[node name="EndingOverlay" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Center" type="CenterContainer" parent="EndingOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="EndingOverlay/Center"]
+custom_minimum_size = Vector2(760, 520)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="Margin" type="MarginContainer" parent="EndingOverlay/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 28
+
+[node name="VBox" type="VBoxContainer" parent="EndingOverlay/Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="EndingOverlay/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.05, 0.1, 0.3, 1)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 24
+text = "VECTOR//BREAK: THE LAST TRAJECTORY — CAMPAIGN COMPLETED"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="EndingOverlay/Center/Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="EpilogueLabel" type="Label" parent="EndingOverlay/Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.88, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ ARCHIVE RECOVERY // DECLASSIFIED AXIOM DOSSIER ]"
+autowrap_mode = 3
+
+[node name="StatsLabel" type="Label" parent="EndingOverlay/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
+theme_override_font_sizes/font_size = 14
+text = "CAMPAIGN SCORE: 000000  |  RECOVERED FRAGMENTS: 0 ◆  |  PILOT RANK: LEGEND OF VESPER"
+horizontal_alignment = 1
+
+[node name="ButtonHBox" type="HBoxContainer" parent="EndingOverlay/Center/Panel/Margin/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 24
+
+[node name="HangarButton" type="Button" parent="EndingOverlay/Center/Panel/Margin/VBox/ButtonHBox"]
+custom_minimum_size = Vector2(220, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ RETURN TO HANGAR ]"
+
+[node name="MenuButton" type="Button" parent="EndingOverlay/Center/Panel/Margin/VBox/ButtonHBox"]
+custom_minimum_size = Vector2(220, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "[ RETURN TO MAIN MENU ]"

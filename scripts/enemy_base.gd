@@ -106,9 +106,13 @@ func die(combo_multiplier: int = 1) -> void:
 		gm.add_score(score_value, combo_multiplier)
 		if gm.has_method("award_currency"):
 			gm.award_currency(15, "enemy_%s_%d" % [name, get_instance_id()])
-		if gm.has_method("spawn_pickup") and randf() < 0.14:
+		if gm.has_method("spawn_pickup"):
 			var safe_pos = Vector2(clamp(global_position.x, 80.0, 1200.0), clamp(global_position.y, 80.0, 640.0))
-			gm.spawn_pickup(gm.PickupType.NANOCELL, safe_pos)
+			var player_node = get_tree().get_first_node_in_group("player") if is_inside_tree() else null
+			var is_damaged = player_node != null and "current_health" in player_node and "max_health" in player_node and player_node.current_health < player_node.max_health
+			var drop_chance: float = 0.40 if is_damaged else 0.20
+			if randf() < drop_chance:
+				gm.spawn_pickup(gm.PickupType.NANOCELL, safe_pos)
 	
 	# Spawn explosion VFX
 	if explosion_scene != null and get_parent() != null and is_inside_tree():

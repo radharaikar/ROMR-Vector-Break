@@ -9,6 +9,8 @@ extends PickupBase
 @export var heal_amount: int = 25
 
 func can_collect(target_node: Node2D) -> bool:
+	if "is_dead" in target_node and target_node.is_dead:
+		return false
 	if "current_health" in target_node and "max_health" in target_node:
 		# Do not consume if player is already at full health
 		if target_node.current_health >= target_node.max_health:

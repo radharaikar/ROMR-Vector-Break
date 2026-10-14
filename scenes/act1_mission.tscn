@@ -63,8 +63,6 @@ position = Vector2(750, 480)
 [node name="MovingReflector" parent="." instance=ExtResource("6_moving_refl")]
 position = Vector2(880, 360)
 
-[node name="LaserGate" parent="." instance=ExtResource("7_laser_gate")]
-position = Vector2(450, 200)
 
 [node name="ObstacleDebris" parent="." instance=ExtResource("12_obstacle")]
 position = Vector2(320, 520)

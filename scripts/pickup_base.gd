@@ -21,9 +21,9 @@ func _ready() -> void:
 	_initial_y = position.y
 	_time_passed = randf() * TAU # Randomize initial phase
 	
-	# Set collision layer / mask: Pickups monitor layer 2 (Player)
+	# Set collision layer / mask: Pickups monitor layer 1 (Player CharacterBody2D) & layer 2 (Hitbox)
 	collision_layer = 0
-	collision_mask = 2 # Player hitbox layer
+	collision_mask = 3
 	
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
@@ -40,17 +40,20 @@ func _process(delta: float) -> void:
 		sprite.scale = Vector2.ONE * (1.0 + sin(_time_passed * 1.5) * 0.08)
 
 func _on_body_entered(body: Node2D) -> void:
-	_try_collect(body)
+	if body and (body.is_in_group("player") or body.name == "Player" or body is CharacterBody2D):
+		_try_collect(body)
 
 func _on_area_entered(area: Area2D) -> void:
 	var parent_body = area.get_parent()
-	if parent_body and parent_body.is_in_group("player"):
+	if parent_body and (parent_body.is_in_group("player") or parent_body.name == "Player"):
 		_try_collect(parent_body)
 
 func _try_collect(target_node: Node2D) -> void:
 	if is_collected:
 		return
-	if not target_node.is_in_group("player"):
+	if not (target_node.is_in_group("player") or target_node.name == "Player"):
+		return
+	if "is_dead" in target_node and target_node.is_dead:
 		return
 	if not can_collect(target_node):
 		return

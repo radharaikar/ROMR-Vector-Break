@@ -54,7 +54,11 @@ var enemy_scenes: Dictionary = {
 }
 
 func _ready() -> void:
-	round_definitions = CampaignData.get_round_definitions()
+	var act_num: int = SaveManager.get_data().get("selected_act", 1) if SaveManager else 1
+	round_definitions = CampaignData.get_round_definitions(act_num)
+
+func set_act(act_num: int) -> void:
+	round_definitions = CampaignData.get_round_definitions(act_num)
 	
 	# Connect to player death if player exists
 	var player = get_tree().get_first_node_in_group("player")

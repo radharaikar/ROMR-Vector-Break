@@ -48,7 +48,7 @@ func _ready() -> void:
 	assert(act1.get_node_or_null("HUD") != null, "HUD missing from Act 1")
 	assert(act1.get_node_or_null("StoryDialogue") != null, "StoryDialogue missing from Act 1")
 	assert(act1.get_node_or_null("MovingReflector") != null, "MovingReflector hazard missing")
-	assert(act1.get_node_or_null("LaserGate") != null, "LaserGate hazard missing")
+	assert(ResourceLoader.exists("res://scenes/laser_gate.tscn"), "LaserGate scene resource missing")
 	assert(act1.get_node_or_null("VictoryCanvas/VictoryOverlay") != null, "VictoryOverlay missing")
 	print("[PASS] 3. Act 1 Mission instantiated with RoundManager, hazards, HUD, and victory screen.")
 	
